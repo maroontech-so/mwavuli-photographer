@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MWAVULI Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<div class="sidebar">
+
+    <h2>MWAVULI <span>Admin</span></h2>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+    <ul id="sidebarMenu">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="upload.html">Upload Media</a></li>
+        <li><a href="gallery.html">Media Library</a></li>
+        <li><a href="bookings.html">Bookings</a></li>
+        <li><a href="messages.html">Messages</a></li>
+        <li><a href="testimonials.html">Testimonials</a></li>
+        <li><a href="../index.html">View Website</a></li>
+        <li><a href="#" id="logoutBtn">Logout</a></li>
+    </ul>
+
+</div>
+
+<div class="main">
+
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back, here's what's happening.</p>
+        </div>
+        <div class="admin-badge"><span class="dot"></span> Admin</div>
+    </div>
+
+    <div class="cards">
+
+    <div class="card">
+        <div class="card-top">
+            <span class="card-icon photo">📷</span>
+            <span class="card-trend">Live</span>
+        </div>
+        <p id="photoCount" class="card-value">0</p>
+        <h2>Photos</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-top">
+            <span class="card-icon video">🎥</span>
+            <span class="card-trend">Live</span>
+        </div>
+        <p id="videoCount" class="card-value">0</p>
+        <h2>Videos</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-top">
+            <span class="card-icon booking">📅</span>
+            <span class="card-trend">Live</span>
+        </div>
+        <p id="bookingCount" class="card-value">0</p>
+        <h2>Bookings</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-top">
+            <span class="card-icon message">✉️</span>
+            <span class="card-trend">Live</span>
+        </div>
+        <p id="messageCount" class="card-value">0</p>
+        <h2>Messages</h2>
+    </div>
+
+    <div class="quick-actions">
+
+    <h2>Quick Actions</h2>
+
+    <div class="action-buttons">
+
+        <a href="upload.html" class="action-btn">
+            📤 Upload Media
+        </a>
+
+        <a href="gallery.html" class="action-btn">
+            🖼 Manage Media
+        </a>
+
+        <a href="bookings.html" class="action-btn">
+            📅 View Bookings
+        </a>
+
+        <a href="../index.html" class="action-btn">
+            🌐 Open Website
+        </a>
+
+    </div>
+
+    <div class="recent-uploads">
+
+    <h2>Recent Uploads</h2>
+
+    <div id="recentMedia">
+
+        <p>No uploads yet.</p>
+
+    </div>
+
+</div>
+
+<div class="recent-bookings">
+
+    <h2>Recent Bookings</h2>
+
+    <div id="recentBookings">
+
+        <p>No bookings yet.</p>
+
+    </div>
+
+</div>
+
+
+
+</div>
+
+</div>
+
+</div>
+
+<script src="auth.js"></script>
+<script src="admin-ui.js"></script>
+<script src="dashboard.js"></script>
+
+</body>

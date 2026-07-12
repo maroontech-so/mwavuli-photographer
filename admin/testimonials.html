@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonials</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="testimonials.css">
+</head>
+<body>
+
+<div class="sidebar">
+
+    <h2>MWAVULI <span>Admin</span></h2>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+    <ul id="sidebarMenu">
+        <li><a href="dashboard.html">🏠 Dashboard</a></li>
+        <li><a href="upload.html">📤 Upload Media</a></li>
+        <li><a href="gallery.html">🖼 Media Library</a></li>
+        <li><a href="bookings.html">📅 Bookings</a></li>
+        <li><a href="messages.html">📩 Messages</a></li>
+        <li><a href="testimonials.html">⭐ Testimonials</a></li>
+        <li><a href="../index.html">🌐 View Website</a></li>
+        <li><a href="#" id="logoutBtn">🚪 Logout</a></li>
+    </ul>
+
+</div>
+
+<div class="main">
+
+    <h1>Testimonials</h1>
+
+    <form id="testimonialForm" class="testimonial-form">
+        <input type="text" id="tName" placeholder="Client Name" required>
+        <textarea id="tText" placeholder="Testimonial text" rows="3" required></textarea>
+        <select id="tRating">
+            <option value="5">5 ★</option>
+            <option value="4">4 ★</option>
+            <option value="3">3 ★</option>
+            <option value="2">2 ★</option>
+            <option value="1">1 ★</option>
+        </select>
+        <button type="submit">Add Testimonial</button>
+        <p id="tMessage"></p>
+    </form>
+
+    <div id="testimonialContainer" class="testimonial-admin-grid"></div>
+
+</div>
+
+<script src="auth.js"></script>
+<script src="admin-ui.js"></script>
+<script src="testimonials.js"></script>
+
+</body>
+</html>

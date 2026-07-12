@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Media</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<div class="sidebar">
+
+    <h2>MWAVULI <span>Admin</span></h2>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+    <ul id="sidebarMenu">
+        <li><a href="dashboard.html">🏠 Dashboard</a></li>
+        <li><a href="upload.html">📤 Upload Media</a></li>
+        <li><a href="gallery.html">🖼 Media Library</a></li>
+        <li><a href="bookings.html">📅 Bookings</a></li>
+        <li><a href="messages.html">📩 Messages</a></li>
+        <li><a href="testimonials.html">⭐ Testimonials</a></li>
+        <li><a href="../index.html">🌐 View Website</a></li>
+        <li><a href="#" id="logoutBtn">🚪 Logout</a></li>
+    </ul>
+
+</div>
+
+<div class="main">
+
+    <div class="page-header">
+        <div>
+            <h1>Upload Media</h1>
+            <p>Add photos or videos to your portfolio gallery.</p>
+        </div>
+    </div>
+
+    <form id="uploadForm" class="panel-form" enctype="multipart/form-data">
+
+        <label for="title">Title Prefix <span class="hint">(optional)</span></label>
+        <input type="text" id="title" placeholder="e.g. Brian & Faith Wedding">
+
+        <label for="category">Category</label>
+        <select id="category" required>
+            <option value="">Choose Category</option>
+            <option>Wedding</option>
+            <option>Portrait</option>
+            <option>Graduation</option>
+            <option>Event</option>
+        </select>
+
+        <label for="images">Media Files <span class="hint">(images or videos, multiple allowed)</span></label>
+        <input type="file" id="images" accept="image/*,video/*" multiple required>
+
+        <div id="fileList" class="file-list"></div>
+
+        <div class="progress-wrap" id="progressWrap" hidden>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+
+        <button type="submit" id="submitBtn">Upload Media</button>
+
+        <p id="message" class="form-msg"></p>
+
+    </form>
+
+</div>
+
+<script src="auth.js"></script>
+<script src="admin-ui.js"></script>
+<script src="upload.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+.message-card{
+    background:white;
+    padding:20px;
+    margin:20px 0;
+    border-radius:12px;
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+}
+
+.message-card h3{
+    color:#C89B3C;
+}
+
+.message-card p{
+    margin:8px 0;
+}
+
+.delete-booking{
+    margin-top:15px;
+    background:#d9534f;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.delete-booking:hover{
+    background:#c9302c;
+}

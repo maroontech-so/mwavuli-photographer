@@ -1,0 +1,90 @@
+.testimonial-form{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    margin-bottom:40px;
+    max-width:600px;
+}
+
+.testimonial-form input,
+.testimonial-form textarea,
+.testimonial-form select{
+    width:100%;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    font-size:15px;
+    outline:none;
+    font-family:inherit;
+}
+
+.testimonial-form input:focus,
+.testimonial-form textarea:focus,
+.testimonial-form select:focus{
+    border-color:#C89B3C;
+}
+
+.testimonial-form button{
+    padding:14px;
+    background:#C89B3C;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.testimonial-form button:hover{
+    background:#b4872d;
+}
+
+#tMessage{
+    margin:0;
+}
+
+.testimonial-admin-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    gap:20px;
+}
+
+.testimonial-admin-card{
+    background:white;
+    padding:22px;
+    border-radius:12px;
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+}
+
+.testimonial-admin-card .stars{
+    color:#C89B3C;
+    font-size:20px;
+    margin-bottom:10px;
+}
+
+.testimonial-admin-card p{
+    line-height:1.6;
+    margin-bottom:10px;
+}
+
+.testimonial-admin-card h4{
+    color:#C89B3C;
+    margin-bottom:15px;
+}
+
+.testimonial-admin-card .delete-btn{
+    width:100%;
+    padding:10px;
+    border:none;
+    background:#d9534f;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.testimonial-admin-card .delete-btn:hover{
+    background:#c9302c;
+}
