@@ -310,14 +310,39 @@
                     <input type="tel" id="phone" placeholder="Phone Number" required>
 
                     <select id="service" required>
-                        <option value="">Select Photography Service</option>
                         <option value="Wedding">Wedding</option>
                         <option value="Portrait">Portrait</option>
                         <option value="Graduation">Graduation</option>
                         <option value="Event">Event</option>
                     </select>
 
-                    <input type="date" id="date" required>
+                    <div class="datepicker-container">
+                        <input 
+                            type="text" 
+                            id="date" 
+                            class="custom-date-input" 
+                            placeholder="Select date" 
+                            required 
+                            readonly
+                        >
+                        <div class="mini-calendar" id="miniCalendar">
+                            <div class="calendar-header">
+                                <button class="nav-btn" id="prevMonthBtn" aria-label="Previous Month">&larr;</button>
+                                <span class="current-month-year" id="monthYearTitle">July 2026</span>
+                                <button class="nav-btn" id="nextMonthBtn" aria-label="Next Month">&rarr;</button>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div class="weekday">Su</div>
+                                <div class="weekday">Mo</div>
+                                <div class="weekday">Tu</div>
+                                <div class="weekday">We</div>
+                                <div class="weekday">Th</div>
+                                <div class="weekday">Fr</div>
+                                <div class="weekday">Sa</div>
+                            </div>
+                            <div class="calendar-days" id="calendarDaysGrid"></div>
+                        </div>
+                    </div>
 
                     <textarea id="message" placeholder="Tell us about your event..." rows="6"></textarea>
 

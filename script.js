@@ -72,4 +72,80 @@
     }
 
     loadTestimonials();
+
+    // Custom date picker calendar for booking form
+    if (document.getElementById('date') && document.getElementById('miniCalendar')) {
+        const dateInput = document.getElementById('date');
+        const miniCalendar = document.getElementById('miniCalendar');
+        const monthYearTitle = document.getElementById('monthYearTitle');
+        const calendarDaysGrid = document.getElementById('calendarDaysGrid');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        let displayDate = new Date();
+        let selectedDate = null;
+        const realToday = new Date();
+
+        function renderCalendar() {
+            const year = displayDate.getFullYear();
+            const month = displayDate.getMonth();
+            monthYearTitle.textContent = `${monthNames[month]} ${year}`;
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            calendarDaysGrid.innerHTML = '';
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('day', 'empty');
+                calendarDaysGrid.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= totalDays; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('day');
+                dayCell.textContent = day;
+                const isToday = day === realToday.getDate() && month === realToday.getMonth() && year === realToday.getFullYear();
+                const isSelected = selectedDate && day === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear();
+                if (isToday) dayCell.classList.add('today');
+                if (isSelected) dayCell.classList.add('selected');
+                dayCell.addEventListener('click', () => {
+                    selectedDate = new Date(year, month, day);
+                    const formattedMonth = String(month + 1).padStart(2, '0');
+                    const formattedDay = String(day).padStart(2, '0');
+                    dateInput.value = `${year}-${formattedMonth}-${formattedDay}`;
+                    renderCalendar();
+                    miniCalendar.classList.remove('active');
+                });
+                calendarDaysGrid.appendChild(dayCell);
+            }
+        }
+
+        dateInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+            miniCalendar.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.datepicker-container')) {
+                miniCalendar.classList.remove('active');
+            }
+        });
+
+        prevMonthBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            displayDate.setMonth(displayDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            displayDate.setMonth(displayDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        renderCalendar();
+    }
 })();
