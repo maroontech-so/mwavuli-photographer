@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery | MWAVULI PHOTOGRAPHY</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
 </head>
+
 <body>
     <header>
         <nav>
@@ -50,12 +53,6 @@
             <div class="portfolio-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="searchInput" placeholder="Search photos or videos...">
-            </div>
-
-            <div class="media-filter">
-                <button class="media-btn active" data-type="all">All</button>
-                <button class="media-btn" data-type="photo">Photos</button>
-                <button class="media-btn" data-type="video">Videos</button>
             </div>
 
             <div class="portfolio-filter">
@@ -109,8 +106,9 @@
     <script src="gallery.js"></script>
     <script>
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("sw.js").catch(() => {});
+            navigator.serviceWorker.register("sw.js").catch(() => { });
         }
     </script>
 </body>
+
 </html>

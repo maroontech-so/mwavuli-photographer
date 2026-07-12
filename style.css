@@ -34,7 +34,7 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    background: rgba(255, 255, 255, .95);
+    background: rgba(255, 255, 255);
     backdrop-filter: blur(10px);
     box-shadow: 0 15px 40px rgba(0, 0, 0, .08);
     z-index: 1000;
@@ -47,7 +47,7 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 0;
+    padding: 6px 0;
 }
 
 .logo {
@@ -327,6 +327,7 @@ nav ul li a:hover {
     color: #C89B3C;
     letter-spacing: 2px;
     margin-bottom: 10px;
+    font-size: 30px;
 }
 
 .about-text h2 {

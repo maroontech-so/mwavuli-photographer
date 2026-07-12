@@ -30,6 +30,7 @@ app.use("/api/admin", adminRoutes);
 // Public media + public data
 app.use("/api/photos", photoRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/messages", require("./routes/messageRoutes"));
 app.use("/api/testimonials", testimonialRoutes);
 
 // Test Route

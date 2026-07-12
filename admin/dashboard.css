@@ -31,19 +31,24 @@ body{
     color:#e2e8f0;
     display:flex;
     flex-direction:column;
-    padding:26px 16px;
+    padding:0;
     z-index:100;
+}
+
+.sidebar-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:26px 20px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
 }
 
 .sidebar h2{
     font-family:'Cinzel',serif;
     letter-spacing:2px;
     font-size:18px;
-    text-align:center;
     color:#fff;
-    padding-bottom:18px;
-    margin-bottom:18px;
-    border-bottom:1px solid rgba(255,255,255,.08);
+    margin:0;
 }
 
 .sidebar h2 span{ color:var(--gold); }
@@ -53,10 +58,10 @@ body{
     display:flex;
     flex-direction:column;
     gap:6px;
+    padding:16px 12px;
     overflow-y:auto;
+    flex:1;
 }
-
-.sidebar ul li{ }
 
 .sidebar ul li a{
     display:flex;
@@ -82,6 +87,13 @@ body{
     box-shadow:0 8px 18px rgba(200,155,60,.35);
 }
 
+.nav-icon{
+    flex-shrink:0;
+    opacity:.85;
+}
+
+.sidebar ul li a.active .nav-icon{ opacity:1; }
+
 .sidebar ul li:last-child{ margin-top:auto; }
 .sidebar ul li:last-child a{
     color:#fca5a5;
@@ -96,6 +108,9 @@ body{
     margin-left:264px;
     padding:32px 40px 48px;
     min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    gap:32px;
 }
 
 /* ===================== PAGE HEADER / TOPBAR ===================== */
@@ -106,7 +121,6 @@ body{
     flex-wrap:wrap;
     gap:16px;
     padding-bottom:22px;
-    margin-bottom:30px;
     border-bottom:1px solid var(--line);
 }
 
@@ -158,6 +172,8 @@ body{
     box-shadow:var(--shadow);
     border:1px solid var(--line);
     transition:.3s;
+    display:flex;
+    flex-direction:column;
 }
 
 .card:hover{
@@ -178,8 +194,12 @@ body{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:22px;
     color:#fff;
+}
+
+.card-icon svg{
+    width:24px;
+    height:24px;
 }
 
 .card-icon.photo{ background:linear-gradient(135deg,#6366f1,#4f46e5); }
@@ -211,8 +231,6 @@ body{
 }
 
 /* ===================== QUICK ACTIONS ===================== */
-.quick-actions{ margin-top:46px; }
-
 .quick-actions h2,
 .recent-uploads h2,
 .recent-bookings h2{
@@ -239,6 +257,14 @@ body{
     font-size:14px;
     transition:.25s;
     box-shadow:var(--shadow);
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+}
+
+.action-icon{
+    flex-shrink:0;
+    color:var(--gold);
 }
 
 .action-btn:hover{
@@ -250,12 +276,18 @@ body{
 /* ===================== RECENT PANELS ===================== */
 .recent-uploads,
 .recent-bookings{
-    margin-top:42px;
     background:var(--surface);
     padding:26px;
     border-radius:var(--radius);
     box-shadow:var(--shadow);
     border:1px solid var(--line);
+}
+
+.empty-state{
+    color:var(--muted);
+    font-size:14px;
+    font-style:italic;
+    padding:8px 0;
 }
 
 .recent-item{
@@ -289,12 +321,19 @@ body{
     color:#fff;
     width:42px; height:42px;
     border-radius:10px;
-    font-size:20px;
     cursor:pointer;
     transition:.25s;
+    padding:0;
+    align-items:center;
+    justify-content:center;
 }
 
 .sidebar-toggle:hover{ background:rgba(255,255,255,.16); }
+
+.sidebar-toggle svg{
+    width:22px;
+    height:22px;
+}
 
 /* legacy direct h1 in main (other pages) */
 .main > h1{
@@ -481,30 +520,24 @@ body{
         top:0;
         width:100%;
         height:auto;
-        flex-direction:row;
-        align-items:center;
-        justify-content:space-between;
+        flex-direction:column;
+        padding:0;
+    }
+
+    .sidebar-header{
         padding:14px 18px;
     }
 
-    .sidebar h2{
-        border-bottom:none;
-        padding-bottom:0;
-        margin-bottom:0;
-        font-size:17px;
-    }
-
-    .sidebar-toggle{ display:block; }
+    .sidebar-toggle{ display:flex; }
 
     .sidebar ul{
         display:none;
-        position:absolute;
-        top:100%; left:0; right:0;
+        position:static;
         background:var(--sidebar);
         padding:12px;
         gap:4px;
-        box-shadow:0 16px 30px rgba(0,0,0,.35);
-        max-height:75vh;
+        box-shadow:none;
+        max-height:none;
     }
 
     .sidebar ul.open{ display:flex; }
@@ -522,6 +555,7 @@ body{
     .cards{ grid-template-columns:1fr 1fr; gap:14px; }
     .card{ padding:18px; }
     .card-icon{ width:40px; height:40px; font-size:18px; }
+    .card-icon svg{ width:20px; height:20px; }
     .card-value{ font-size:28px; }
 }
 
