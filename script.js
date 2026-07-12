@@ -170,7 +170,7 @@
                 carouselTrack.style.transform = `translateX(${carouselTrack.offsetWidth / 2}px)`;
                 setTimeout(() => {
                     carouselTrack.style.transition = "none";
-                    carouselTrack.style.transform = "translateX(0)";
+                    carouselTrack.style.transform = "";
                     carouselTrack.classList.add("animate");
                 }, 500);
             });
@@ -183,7 +183,7 @@
                 carouselTrack.style.transform = `translateX(-${carouselTrack.offsetWidth / 2}px)`;
                 setTimeout(() => {
                     carouselTrack.style.transition = "none";
-                    carouselTrack.style.transform = "translateX(0)";
+                    carouselTrack.style.transform = "";
                     carouselTrack.classList.add("animate");
                 }, 500);
             });
