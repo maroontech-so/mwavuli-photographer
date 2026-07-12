@@ -167,35 +167,6 @@ PORT=5000
 ```bash
 cd server
 npm install
-```
-
-### Start Development Server
-
-```bash
-npm run dev
-```
-
-
-### Start Production Server
-
-```bash
-npm start
-```
-
-The server runs on `http://localhost:5000` by default.
-
-## API Reference
-
-### Health
-| Method | Path | Description |
-|---|---|---|
-| GET | `/api/health` | Health check |
-
-### Admin Auth
-| Method | Path | Description |
-|---|---|---|
-| POST | `/api/admin/login` | Login admin, returns JWT |
-| POST | `/api/admin/register` | Register new admin (requires auth) |
 
 ### Photos
 | Method | Path | Description |
