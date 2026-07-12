@@ -15,6 +15,11 @@ const projectSchema = new mongoose.Schema({
     location:{
         type:String,
         default:""
+    },
+
+    cover:{
+        type:String,
+        default:""
     }
 
 },{

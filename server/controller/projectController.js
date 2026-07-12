@@ -6,18 +6,15 @@ exports.getProjects = async (req, res) => {
     try {
         const projects = await Project.find().sort({ createdAt: -1 });
 
-        const projectsWithCovers = await Promise.all(
-            projects.map(async (project) => {
-                const cover = await Photo.findOne({ project: project._id }).sort({ createdAt: 1 });
-                return {
-                    _id: project._id,
-                    title: project.title,
-                    description: project.description,
-                    location: project.location,
-                    cover: cover ? cover.file : null
-                };
-            })
-        );
+        const projectsWithCovers = projects.map(project => {
+            return {
+                _id: project._id,
+                title: project.title,
+                description: project.description,
+                location: project.location,
+                cover: project.cover || ""
+            };
+        });
 
         res.json({ success: true, projects: projectsWithCovers });
     } catch (error) {
@@ -34,7 +31,6 @@ exports.getProject = async (req, res) => {
         }
 
         const photos = await Photo.find({ project: project._id }).sort({ createdAt: 1 });
-        const cover = photos[0] || null;
 
         res.json({
             success: true,
@@ -43,7 +39,7 @@ exports.getProject = async (req, res) => {
                 title: project.title,
                 description: project.description,
                 location: project.location,
-                cover: cover ? cover.file : null
+                cover: project.cover || ""
             },
             photos
         });
@@ -75,10 +71,37 @@ exports.updateProject = async (req, res) => {
     }
 };
 
+// Admin: set project cover photo
+exports.setCover = async (req, res) => {
+    try {
+        const { coverPhotoId } = req.body;
+        const project = await Project.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ success: false, message: "Project not found" });
+        }
+
+        const photo = await Photo.findById(coverPhotoId);
+        if (!photo) {
+            return res.status(404).json({ success: false, message: "Photo not found" });
+        }
+
+        if (photo.project && photo.project.toString() !== project._id.toString()) {
+            return res.status(400).json({ success: false, message: "Photo does not belong to this project" });
+        }
+
+        project.cover = photo.file;
+        await project.save();
+
+        res.json({ success: true, project });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 // Admin: delete project
 exports.deleteProject = async (req, res) => {
     try {
-        await Photo.updateMany({ project: req.params.id }, { $unset: { project: 1 } });
+        await Photo.deleteMany({ project: req.params.id });
         await Project.findByIdAndDelete(req.params.id);
         res.json({ success: true, message: "Project deleted" });
     } catch (error) {

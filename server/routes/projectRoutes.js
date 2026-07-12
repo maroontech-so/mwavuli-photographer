@@ -8,6 +8,7 @@ router.get("/:id", projectController.getProject);
 
 router.post("/", auth, projectController.createProject);
 router.put("/:id", auth, projectController.updateProject);
+router.put("/:id/cover", auth, projectController.setCover);
 router.delete("/:id", auth, projectController.deleteProject);
 
 module.exports = router;
