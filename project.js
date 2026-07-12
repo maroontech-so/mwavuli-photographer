@@ -1,6 +1,10 @@
 (function () {
     const API = window.API_BASE
-        || (window.location.port === '5000' ? '' : (window.location.protocol === 'file:' ? 'http://localhost:5000' : `${window.location.protocol}//${window.location.hostname}:5000`));
+        || (!window.location.port || window.location.port === '5000'
+            ? ''
+            : (window.location.protocol === 'file:'
+                ? 'http://localhost:5000'
+                : `${window.location.protocol}//${window.location.hostname}:5000`));
 
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get("id");
@@ -10,7 +14,7 @@
     const gallery = document.getElementById("gallery");
 
     if (!projectId || !gallery) {
-        titleEl.textContent = "Project not found";
+        if (titleEl) titleEl.textContent = "Project not found";
         return;
     }
 
@@ -37,20 +41,21 @@
                 return;
             }
 
-            photos.forEach(photo => {
+    photos.forEach(photo => {
                 const div = document.createElement("div");
                 div.className = "gallery-item";
                 const media = photo.mediaType === "video"
                     ? `<video controls preload="metadata" draggable="false"><source src="${API}/uploads/${photo.file}" type="video/mp4"></video>`
                     : `<img src="${API}/uploads/${photo.file}" alt="${photo.title}" draggable="false">`;
-                div.innerHTML = `
-                    ${media}
-                    <div class="gallery-overlay">
-                        <h3>${photo.title}</h3>
-                        <p>${project.title}</p>
-                    </div>
-                `;
+                div.innerHTML = media;
                 gallery.appendChild(div);
+            });
+
+            const mosaic = ["big", "", "tall", "", "wide", "", "tall", "", "", "wide"];
+            const items = gallery.querySelectorAll(".gallery-item");
+            items.forEach((item, i) => {
+                const span = mosaic[i % mosaic.length];
+                if (span) item.classList.add(span);
             });
 
             wireLightbox();

@@ -7,7 +7,21 @@ const newBtn = document.getElementById("newProjectBtn");
 const cancelBtn = document.getElementById("cancelBtn");
 const modalTitle = document.getElementById("modalTitle");
 
+const filesModal = document.getElementById("projectFilesModal");
+const filesModalTitle = document.getElementById("filesModalTitle");
+const projectUploadForm = document.getElementById("projectUploadForm");
+const pUploadFiles = document.getElementById("pUploadFiles");
+const pFileList = document.getElementById("pFileList");
+const pProgressWrap = document.getElementById("pProgressWrap");
+const pProgressFill = document.getElementById("pProgressFill");
+const pProgressPct = document.getElementById("pProgressPct");
+const pSubmitBtn = document.getElementById("pSubmitBtn");
+const pMessage = document.getElementById("pMessage");
+const projectFilesGrid = document.getElementById("projectFilesGrid");
+const closeFilesBtn = document.getElementById("closeFilesBtn");
+
 let projects = [];
+let currentProjectId = null;
 
 function openModal(project = null) {
     modalTitle.textContent = project ? "Edit Project" : "New Project";
@@ -100,14 +114,22 @@ function renderProjects() {
         const actions = document.createElement("div");
         actions.className = "project-admin-actions";
 
+        const manageBtn = document.createElement("button");
+        manageBtn.className = "action-manage";
+        manageBtn.textContent = "Manage Files";
+        manageBtn.addEventListener("click", () => openProjectFilesModal(p._id));
+
         const editBtn = document.createElement("button");
+        editBtn.className = "action-edit";
         editBtn.textContent = "Edit";
         editBtn.addEventListener("click", () => openModal(projects.find(x => x._id === p._id)));
 
         const delBtn = document.createElement("button");
+        delBtn.className = "action-delete";
         delBtn.textContent = "Delete";
         delBtn.addEventListener("click", () => deleteProject(p._id));
 
+        actions.appendChild(manageBtn);
         actions.appendChild(editBtn);
         actions.appendChild(delBtn);
 
@@ -134,5 +156,214 @@ async function loadProjects() {
         console.error(err);
     }
 }
+
+function openProjectFilesModal(projectId) {
+    currentProjectId = projectId;
+    const project = projects.find(p => p._id === projectId);
+    filesModalTitle.textContent = project ? `Manage Files: ${project.title}` : "Manage Files";
+    projectUploadForm.reset();
+    pFileList.innerHTML = "";
+    pMessage.textContent = "";
+    pMessage.className = "form-msg";
+    pProgressWrap.hidden = true;
+    pProgressFill.style.width = "0%";
+    pProgressPct.textContent = "0%";
+    filesModal.classList.remove("hidden");
+    loadProjectPhotos(projectId);
+}
+
+function closeFilesModal() {
+    filesModal.classList.add("hidden");
+    currentProjectId = null;
+}
+
+closeFilesBtn.addEventListener("click", closeFilesModal);
+filesModal.addEventListener("click", (e) => {
+    if (e.target === filesModal) closeFilesModal();
+});
+
+async function loadProjectPhotos(projectId) {
+    try {
+        const res = await apiFetch(`${API}/api/projects/${projectId}`);
+        const data = await res.json();
+        const photos = data.photos || [];
+        renderProjectFiles(photos, data.project);
+    } catch (err) {
+        console.error("Failed to load project photos", err);
+    }
+}
+
+function renderProjectFiles(photos, project) {
+    projectFilesGrid.innerHTML = "";
+
+    if (!photos.length) {
+        projectFilesGrid.innerHTML = "<p class='empty-state'>No files in this project yet.</p>";
+        return;
+    }
+
+    photos.forEach(photo => {
+        const item = document.createElement("div");
+        item.className = "project-file-item";
+        const isCover = project && project.cover === photo.file;
+        if (isCover) item.classList.add("is-cover");
+
+        const media = photo.mediaType === "video"
+            ? `<video controls preload="metadata" src="${API}/uploads/${photo.file}" type="video/mp4"></video>`
+            : `<img src="${API}/uploads/${photo.file}" alt="${photo.title}">`;
+
+        item.innerHTML = `
+            <div class="project-file-media">${media}</div>
+            <div class="project-file-info">
+                <span class="project-file-title">${escapeHtml(photo.title)}</span>
+                <span class="project-file-type">${photo.mediaType}</span>
+            </div>
+            <div class="project-file-actions">
+                ${!isCover ? `<button class="cover-btn" data-id="${photo._id}">Set Cover</button>` : `<span class="cover-badge">Cover</span>`}
+                <button class="delete-file-btn" data-id="${photo._id}">Delete</button>
+            </div>
+        `;
+
+        projectFilesGrid.appendChild(item);
+    });
+
+    projectFilesGrid.querySelectorAll(".cover-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const photoId = btn.dataset.id;
+            await apiFetch(`${API}/api/projects/${currentProjectId}/cover`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ coverPhotoId: photoId })
+            });
+            loadProjectPhotos(currentProjectId);
+            loadProjects();
+        });
+    });
+
+    projectFilesGrid.querySelectorAll(".delete-file-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            if (!confirm("Remove this file from the project?")) return;
+            const photoId = btn.dataset.id;
+            await apiFetch(`${API}/api/photos/${photoId}`, { method: "DELETE" });
+            loadProjectPhotos(currentProjectId);
+            loadProjects();
+        });
+    });
+}
+
+function renderPUploadFiles() {
+    pFileList.innerHTML = "";
+    [...pUploadFiles.files].forEach((file, i) => {
+        const isVideo = file.type.startsWith("video");
+        const item = document.createElement("div");
+        item.className = "file-item";
+        item.innerHTML = `
+            <span class="fi-icon">${isVideo ? "🎥" : "🖼"}</span>
+            <span class="fi-name">${file.name}</span>
+            <span class="fi-size">${formatSize(file.size)}</span>
+            <button type="button" class="fi-remove" data-i="${i}" aria-label="Remove">&times;</button>
+        `;
+        pFileList.appendChild(item);
+    });
+
+    pFileList.querySelectorAll(".fi-remove").forEach(btn => {
+        btn.addEventListener("click", () => removePUploadFile(Number(btn.dataset.i)));
+    });
+}
+
+function removePUploadFile(index) {
+    const dt = new DataTransfer();
+    [...pUploadFiles.files].forEach((f, i) => {
+        if (i !== index) dt.items.add(f);
+    });
+    pUploadFiles.files = dt.files;
+    renderPUploadFiles();
+}
+
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+function setPMessage(text, type) {
+    pMessage.textContent = text;
+    pMessage.className = "form-msg" + (type ? " " + type : "");
+}
+
+function setPProgress(pct) {
+    pProgressWrap.hidden = false;
+    pProgressFill.style.width = pct + "%";
+    pProgressPct.textContent = Math.round(pct) + "%";
+}
+
+pUploadFiles.addEventListener("change", renderPUploadFiles);
+
+projectUploadForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const category = document.getElementById("pUploadCategory")?.value || "";
+    const title = document.getElementById("pUploadTitle")?.value || "";
+
+    if (!category) {
+        setPMessage("Please choose a category.", "error");
+        return;
+    }
+    if (!pUploadFiles.files.length) {
+        setPMessage("Please select at least one file.", "error");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("category", category);
+    formData.append("project", currentProjectId);
+    [...pUploadFiles.files].forEach(f => formData.append("images", f));
+
+    const token = window.adminAuth.getToken();
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${API}/api/photos/upload`);
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+
+    xhr.upload.addEventListener("progress", (ev) => {
+        if (ev.lengthComputable) setPProgress((ev.loaded / ev.total) * 100);
+    });
+
+    xhr.addEventListener("load", () => {
+        pSubmitBtn.disabled = false;
+        pSubmitBtn.textContent = "Upload to Project";
+
+        let data = {};
+        try { data = JSON.parse(xhr.responseText); } catch (_) {}
+
+        if (xhr.status === 401) {
+            window.adminAuth.logout();
+            return;
+        }
+
+        if (xhr.status >= 200 && xhr.status < 300 && data.success) {
+            setPMessage(`${data.message}`, "success");
+            projectUploadForm.reset();
+            pFileList.innerHTML = "";
+            pProgressWrap.hidden = true;
+            pProgressFill.style.width = "0%";
+            pProgressPct.textContent = "0%";
+            loadProjectPhotos(currentProjectId);
+            loadProjects();
+        } else {
+            setPMessage(data.message || "Upload failed. Please try again.", "error");
+        }
+    });
+
+    xhr.addEventListener("error", () => {
+        pSubmitBtn.disabled = false;
+        pSubmitBtn.textContent = "Upload to Project";
+        setPMessage("Network error. Is the server running?", "error");
+    });
+
+    pSubmitBtn.disabled = true;
+    pSubmitBtn.textContent = "Uploading...";
+    setPProgress(0);
+    xhr.send(formData);
+});
 
 loadProjects();

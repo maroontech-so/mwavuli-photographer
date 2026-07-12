@@ -130,12 +130,17 @@
     font-size: 13px;
 }
 
-.project-admin-actions button:first-child {
+.project-admin-actions .action-manage {
     background: var(--gold);
     color: #fff;
 }
 
-.project-admin-actions button:last-child {
+.project-admin-actions .action-edit {
+    background: #e5e7eb;
+    color: var(--ink);
+}
+
+.project-admin-actions .action-delete {
     background: #fee2e2;
     color: #dc2626;
 }
@@ -145,4 +150,119 @@
     text-align: center;
     color: var(--muted);
     padding: 40px 0;
+}
+
+.modal-card-wide {
+    max-width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.files-section {
+    margin-top: 24px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+}
+
+.files-section h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: var(--ink);
+}
+
+.project-files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+
+.project-file-item {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-file-item.is-cover {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(200, 155, 60, 0.25);
+}
+
+.project-file-media {
+    width: 100%;
+    height: 140px;
+    background: #f5f5f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.project-file-media img,
+.project-file-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.project-file-info {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.project-file-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.project-file-type {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: capitalize;
+}
+
+.project-file-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0 12px 12px;
+}
+
+.project-file-actions button {
+    flex: 1;
+    padding: 6px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.cover-btn {
+    background: var(--gold);
+    color: #fff;
+}
+
+.cover-badge {
+    flex: 1;
+    text-align: center;
+    padding: 6px;
+    border-radius: 8px;
+    background: rgba(200, 155, 60, 0.12);
+    color: var(--gold-dark);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.delete-file-btn {
+    background: #fee2e2;
+    color: #dc2626;
 }

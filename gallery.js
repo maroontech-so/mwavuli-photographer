@@ -5,38 +5,78 @@ const API = window.API_BASE
             ? 'http://localhost:5000'
             : `${window.location.protocol}//${window.location.hostname}:5000`));
 
-const gallery = document.getElementById("gallery");
+const projectCollectionsEl = document.getElementById("projectCollections");
+const generalGallery = document.getElementById("generalGallery");
 
-if (gallery) {
-    const limit = parseInt(gallery.dataset.limit || "0", 10);
-    let allPhotos = [];
-
-    const searchInput = document.getElementById("searchInput");
-    const sortMedia = document.getElementById("sortMedia");
-    const filterButtons = document.querySelectorAll(".filter-btn");
-    const mediaButtons = document.querySelectorAll(".media-btn");
-
-    async function loadPhotos() {
+if (projectCollectionsEl || generalGallery) {
+    async function loadGallery() {
         try {
-            const res = await fetch(`${API}/api/photos`);
-            const data = await res.json();
-            allPhotos = data.photos || [];
-            render(limit ? allPhotos.slice(0, limit) : allPhotos);
+            const [projectsRes, photosRes] = await Promise.all([
+                fetch(`${API}/api/projects`),
+                fetch(`${API}/api/photos`)
+            ]);
+
+            const projectsData = await projectsRes.json();
+            const photosData = await photosRes.json();
+
+            const projects = projectsData.projects || [];
+            const allPhotos = photosData.photos || [];
+
+            const generalPhotos = allPhotos.filter(p => !p.project);
+
+            if (projectCollectionsEl) {
+                renderProjectCollections(projects);
+            }
+
+            if (generalGallery) {
+                renderGeneralGallery(generalPhotos);
+            }
         } catch (err) {
-            console.error("Failed to load photos", err);
-            gallery.innerHTML = "<p class='gallery-empty'>Could not load the gallery.</p>";
+            console.error("Failed to load gallery", err);
+            if (projectCollectionsEl) {
+                projectCollectionsEl.innerHTML = "<p class='gallery-empty'>Could not load collections.</p>";
+            }
+            if (generalGallery) {
+                generalGallery.innerHTML = "<p class='gallery-empty'>Could not load gallery.</p>";
+            }
         }
     }
 
-    function render(photos) {
-        gallery.innerHTML = "";
+    function renderProjectCollections(projects) {
+        projectCollectionsEl.innerHTML = "";
 
-        if (!photos.length) {
-            gallery.innerHTML = "<p class='gallery-empty'>No media yet.</p>";
+        if (!projects.length) {
+            projectCollectionsEl.innerHTML = "<p class='gallery-empty'>No projects yet.</p>";
             return;
         }
 
-        // Mosaic pattern (works through filters & sort)
+        projects.forEach(p => {
+            const card = document.createElement("a");
+            card.href = `project.html?id=${p._id}`;
+            card.className = "gallery-collection-card";
+            card.innerHTML = `
+                <div class="collection-cover">
+                    ${p.cover
+                        ? `<img src="${API}/uploads/${p.cover}" alt="${escapeHtml(p.title)}">`
+                        : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`}
+                    <div class="project-overlay">
+                        <h3>${escapeHtml(p.title)}</h3>
+                        <p>${escapeHtml(p.location || "")}</p>
+                    </div>
+                </div>
+            `;
+            projectCollectionsEl.appendChild(card);
+        });
+    }
+
+    function renderGeneralGallery(photos) {
+        generalGallery.innerHTML = "";
+
+        if (!photos.length) {
+            generalGallery.innerHTML = "<p class='gallery-empty'>No general photos yet.</p>";
+            return;
+        }
+
         const mosaic = ["big", "", "tall", "", "wide", "", "tall", "", "", "wide"];
 
         photos.forEach((photo, i) => {
@@ -47,13 +87,9 @@ if (gallery) {
                    </video>`
                 : `<img src="${API}/uploads/${photo.file}" alt="${photo.title}" draggable="false">`;
 
-            gallery.innerHTML += `
+            generalGallery.innerHTML += `
             <div class="gallery-item ${span}">
                 ${media}
-                <div class="gallery-overlay">
-                    <h3>${photo.title}</h3>
-                    <p>${photo.category}</p>
-                </div>
             </div>`;
         });
 
@@ -61,14 +97,13 @@ if (gallery) {
         protectImages();
     }
 
-    // Lightbox (reuses #lightbox in the page)
     function wireLightbox() {
         const lightbox = document.getElementById("lightbox");
         if (!lightbox) return;
         const lightboxImg = document.getElementById("lightbox-img");
         const closeBtn = document.querySelector(".close");
 
-        gallery.querySelectorAll(".gallery-item img").forEach(image => {
+        generalGallery.querySelectorAll(".gallery-item img").forEach(image => {
             image.addEventListener("click", () => {
                 lightbox.style.display = "flex";
                 lightboxImg.src = image.src;
@@ -83,73 +118,20 @@ if (gallery) {
         });
     }
 
-    // Deterrent against casual right-click / drag download
     function protectImages() {
-        gallery.querySelectorAll(".gallery-item img, .gallery-item video").forEach(el => {
+        generalGallery.querySelectorAll(".gallery-item img, .gallery-item video").forEach(el => {
             el.addEventListener("contextmenu", e => e.preventDefault());
             el.setAttribute("draggable", "false");
         });
     }
 
-    // --- Filters / search / sort (only if present on the page) ---
-    if (filterButtons.length) {
-        filterButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                document.querySelector(".filter-btn.active")?.classList.remove("active");
-                button.classList.add("active");
-                const category = button.dataset.category;
-                render(category === "All"
-                    ? allPhotos
-                    : allPhotos.filter(p => p.category === category));
-            });
-        });
-    }
+    loadGallery();
+}
 
-    if (mediaButtons.length) {
-        mediaButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                document.querySelector(".media-btn.active")?.classList.remove("active");
-                button.classList.add("active");
-                const type = button.dataset.type;
-                render(type === "all"
-                    ? allPhotos
-                    : allPhotos.filter(p => p.mediaType === type));
-            });
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener("input", () => {
-            const keyword = searchInput.value.toLowerCase();
-            render(allPhotos.filter(p =>
-                p.title.toLowerCase().includes(keyword) ||
-                p.category.toLowerCase().includes(keyword)
-            ));
-        });
-    }
-
-    if (sortMedia) {
-        sortMedia.addEventListener("change", () => {
-            const sorted = [...allPhotos];
-            switch (sortMedia.value) {
-                case "newest":
-                    sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    break;
-                case "oldest":
-                    sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                    break;
-                case "az":
-                    sorted.sort((a, b) => a.title.localeCompare(b.title));
-                    break;
-                case "za":
-                    sorted.sort((a, b) => b.title.localeCompare(a.title));
-                    break;
-            }
-            render(sorted);
-        });
-    }
-
-    loadPhotos();
+function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
 }
 
 // Global guard: block right-click on any gallery image across the site

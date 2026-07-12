@@ -32,7 +32,6 @@
                 <li><a href="index.html#about">About</a></li>
                 <li><a href="gallery.html" class="active">Portfolio</a></li>
                 <li><a href="index.html#services">Services</a></li>
-                <li><a href="index.html#projects">Projects</a></li>
                 <li><a href="index.html#testimonials">Testimonials</a></li>
                 <li><a href="index.html#contact">Contact</a></li>
                 <li class="mobile-cta"><a href="index.html#contact" class="btn">Book Now</a></li>
@@ -46,34 +45,18 @@
         <div class="page-head">
             <span class="section-eyebrow">Our Work</span>
             <h1>Gallery</h1>
-            <p>A curated mosaic of moments we've captured — weddings, portraits, graduations and events.</p>
+            <p>Every project tells a unique story. Browse our collections and general portfolio below.</p>
         </div>
 
-        <div class="gallery-toolbar">
-            <div class="portfolio-search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Search photos or videos...">
-            </div>
-
-            <div class="portfolio-filter">
-                <button class="filter-btn active" data-category="All">All</button>
-                <button class="filter-btn" data-category="Wedding">Wedding</button>
-                <button class="filter-btn" data-category="Portrait">Portrait</button>
-                <button class="filter-btn" data-category="Graduation">Graduation</button>
-                <button class="filter-btn" data-category="Event">Event</button>
-            </div>
-
-            <div class="sort-container">
-                <select id="sortMedia">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="az">Title (A-Z)</option>
-                    <option value="za">Title (Z-A)</option>
-                </select>
-            </div>
+        <div class="gallery-section">
+            <h2 class="gallery-section-title">Project Collections</h2>
+            <div id="projectCollections" class="project-collections-grid"></div>
         </div>
 
-        <div class="gallery" id="gallery"></div>
+        <div class="gallery-section">
+            <h2 class="gallery-section-title">General Gallery</h2>
+            <div class="gallery" id="generalGallery"></div>
+        </div>
     </section>
 
     <!-- Image Lightbox -->

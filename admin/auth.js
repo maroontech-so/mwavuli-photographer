@@ -15,10 +15,11 @@
             return window.API_BASE;
         }
 
-        const isVercel = window.location.hostname.includes('vercel.app') ||
-                        window.location.hostname.includes('vercel.com');
+        const isHosted = window.location.hostname.includes('vercel.app') ||
+                        window.location.hostname.includes('vercel.com') ||
+                        window.location.hostname.includes('onrender.com');
         
-        if (isVercel) {
+        if (isHosted) {
             return window.location.origin;
         }
 

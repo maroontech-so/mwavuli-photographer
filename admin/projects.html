@@ -131,6 +131,47 @@
         </div>
     </div>
 
+    <div id="projectFilesModal" class="modal hidden">
+        <div class="modal-card modal-card-wide">
+            <h2 id="filesModalTitle">Project Files</h2>
+
+            <form id="projectUploadForm" class="panel-form" enctype="multipart/form-data">
+                <label for="pUploadTitle">Title Prefix <span class="hint">(optional)</span></label>
+                <input type="text" id="pUploadTitle" placeholder="e.g. Brian & Faith Wedding">
+
+                <label for="pUploadCategory">Category</label>
+                <select id="pUploadCategory" required>
+                    <option value="">Choose Category</option>
+                    <option>Wedding</option>
+                    <option>Portrait</option>
+                    <option>Graduation</option>
+                    <option>Event</option>
+                </select>
+
+                <label for="pUploadFiles">Add Photos / Videos</label>
+                <input type="file" id="pUploadFiles" accept="image/*,video/*" multiple>
+                <div id="pFileList" class="file-list"></div>
+                <div class="progress-wrap" id="pProgressWrap" hidden>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="pProgressFill"></div>
+                    </div>
+                    <span class="progress-pct" id="pProgressPct">0%</span>
+                </div>
+                <button type="submit" id="pSubmitBtn">Upload to Project</button>
+                <p id="pMessage" class="form-msg"></p>
+            </form>
+
+            <div class="files-section">
+                <h3>Current Files</h3>
+                <div id="projectFilesGrid" class="project-files-grid"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="closeFilesBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="auth.js?v=3"></script>
     <script src="admin-ui.js?v=3"></script>
     <script src="projects.js?v=3"></script>

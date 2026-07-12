@@ -61,17 +61,176 @@
         }
     }
 
-    // Mobile nav toggle
+    loadTestimonials();
+
+    // Mobile sidebar nav
     const navToggle = document.getElementById("navToggle");
-    const navMenu = document.getElementById("navMenu");
-    if (navToggle && navMenu) {
-        navToggle.addEventListener("click", () => navMenu.classList.toggle("open"));
-        navMenu.querySelectorAll("a").forEach(link =>
-            link.addEventListener("click", () => navMenu.classList.remove("open"))
-        );
+    const sidebar = document.querySelector(".mobile-sidebar");
+    const sidebarClose = document.querySelector(".sidebar-close");
+    const sidebarLinks = sidebar ? sidebar.querySelectorAll("a") : [];
+
+    function openSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.add("open");
+        document.body.style.overflow = "hidden";
     }
 
-    loadTestimonials();
+    function closeSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.remove("open");
+        document.body.style.overflow = "";
+    }
+
+    if (navToggle) {
+        navToggle.addEventListener("click", openSidebar);
+    }
+
+    if (sidebarClose) {
+        sidebarClose.addEventListener("click", closeSidebar);
+    }
+
+    if (sidebar) {
+        sidebar.addEventListener("click", (e) => {
+            if (e.target === sidebar.querySelector(".sidebar-backdrop")) {
+                closeSidebar();
+            }
+        });
+    }
+
+    sidebarLinks.forEach(link => {
+        link.addEventListener("click", closeSidebar);
+    });
+
+    // Featured projects carousel
+    const carouselTrack = document.getElementById("featuredCarousel");
+    const prevBtn = document.getElementById("carouselPrev");
+    const nextBtn = document.getElementById("carouselNext");
+    let autoscrollInterval = null;
+
+    if (carouselTrack) {
+        let projects = [];
+        let currentIndex = 0;
+        let slidesPerView = 3;
+
+        function updateSlidesPerView() {
+            if (window.innerWidth <= 768) {
+                slidesPerView = 1;
+            } else if (window.innerWidth <= 1024) {
+                slidesPerView = 2;
+            } else {
+                slidesPerView = 3;
+            }
+        }
+
+        async function loadProjects() {
+            try {
+                const res = await fetch(`${API}/api/projects`);
+                const data = await res.json();
+                projects = data.projects || [];
+                renderCarousel();
+                startAutoscroll();
+            } catch (err) {
+                console.error("Failed to load projects", err);
+                carouselTrack.innerHTML = "<p class='gallery-empty'>Could not load projects.</p>";
+            }
+        }
+
+        function renderCarousel() {
+            if (!projects.length) {
+                carouselTrack.innerHTML = "<p class='gallery-empty'>No projects yet.</p>";
+                return;
+            }
+
+            carouselTrack.innerHTML = projects.map(p => `
+                <a class="featured-card" href="project.html?id=${p._id}">
+                    <div class="project-cover">
+                        ${p.cover
+                            ? `<img src="${API}/uploads/${p.cover}" alt="${p.title}">`
+                            : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`}
+                        <div class="project-overlay">
+                            <h3>${escapeHtml(p.title)}</h3>
+                            <p>${escapeHtml(p.location || "")}</p>
+                        </div>
+                    </div>
+                </a>
+            `).join("");
+
+            updateSlidesPerView();
+            currentIndex = 0;
+            updateCarouselPosition();
+        }
+
+        function updateCarouselPosition() {
+            const cards = carouselTrack.querySelectorAll(".featured-card");
+            if (!cards.length) return;
+
+            const card = cards[0];
+            const cardWidth = card.offsetWidth;
+            const gap = 24;
+            const maxIndex = Math.max(0, projects.length - slidesPerView);
+            currentIndex = Math.min(currentIndex, maxIndex);
+            currentIndex = Math.max(currentIndex, 0);
+
+            const offset = currentIndex * (cardWidth + gap);
+            carouselTrack.style.transform = `translateX(-${offset}px)`;
+        }
+
+        function startAutoscroll() {
+            stopAutoscroll();
+            autoscrollInterval = setInterval(() => {
+                const cards = carouselTrack.querySelectorAll(".featured-card");
+                if (!cards.length) return;
+                const maxIndex = Math.max(0, projects.length - slidesPerView);
+                currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+                updateCarouselPosition();
+            }, 4000);
+        }
+
+        function stopAutoscroll() {
+            if (autoscrollInterval) {
+                clearInterval(autoscrollInterval);
+                autoscrollInterval = null;
+            }
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener("click", () => {
+                currentIndex--;
+                updateCarouselPosition();
+                stopAutoscroll();
+                startAutoscroll();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener("click", () => {
+                currentIndex++;
+                updateCarouselPosition();
+                stopAutoscroll();
+                startAutoscroll();
+            });
+        }
+
+        carouselTrack.addEventListener("mouseenter", stopAutoscroll);
+        carouselTrack.addEventListener("mouseleave", startAutoscroll);
+        carouselTrack.addEventListener("touchstart", stopAutoscroll, { passive: true });
+        carouselTrack.addEventListener("touchend", () => {
+            setTimeout(startAutoscroll, 3000);
+        });
+
+        window.addEventListener("resize", () => {
+            updateSlidesPerView();
+            updateCarouselPosition();
+        });
+
+        loadProjects();
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
 
     // Custom date picker calendar for booking form
     if (document.getElementById('date') && document.getElementById('miniCalendar')) {
@@ -147,5 +306,91 @@
         });
 
         renderCalendar();
+    }
+
+    // Enhanced service picker
+    const servicePicker = document.getElementById('servicePicker');
+    if (servicePicker) {
+        const trigger = document.getElementById('servicePickerTrigger');
+        const dropdown = document.getElementById('servicePickerDropdown');
+        const valueEl = document.getElementById('servicePickerValue');
+        const hiddenSelect = document.getElementById('service');
+        const options = Array.from(dropdown.querySelectorAll('.service-picker-option'));
+
+        function openPicker() {
+            servicePicker.classList.add('open');
+            trigger.setAttribute('aria-expanded', 'true');
+        }
+
+        function closePicker() {
+            servicePicker.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            options.forEach(opt => opt.classList.remove('focused'));
+        }
+
+        function selectOption(option) {
+            const value = option.dataset.value;
+            const text = option.querySelector('.service-text').textContent;
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                opt.setAttribute('aria-selected', 'false');
+            });
+            option.classList.add('selected');
+            option.setAttribute('aria-selected', 'true');
+            valueEl.textContent = text;
+            valueEl.classList.remove('placeholder');
+            hiddenSelect.value = value;
+            closePicker();
+        }
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (servicePicker.classList.contains('open')) {
+                closePicker();
+            } else {
+                openPicker();
+            }
+        });
+
+        trigger.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (servicePicker.classList.contains('open')) {
+                    closePicker();
+                } else {
+                    openPicker();
+                }
+            }
+        });
+
+        options.forEach((option, index) => {
+            option.addEventListener('click', () => selectOption(option));
+            option.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectOption(option);
+                }
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const next = options[(index + 1) % options.length];
+                    next.focus();
+                    options.forEach(o => o.classList.remove('focused'));
+                    next.classList.add('focused');
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prev = options[(index - 1 + options.length) % options.length];
+                    prev.focus();
+                    options.forEach(o => o.classList.remove('focused'));
+                    prev.classList.add('focused');
+                }
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!servicePicker.contains(e.target)) {
+                closePicker();
+            }
+        });
     }
 })();
