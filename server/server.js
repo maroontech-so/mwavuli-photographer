@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-console.log("MONGO_URI =", process.env.MONGO_URI);
+console.log("MONGO_URI =", process.env.MONGO_URI ? "Set" : "Not set");
 
 const connectDB = require("./config/db");
 const adminRoutes = require("./routes/adminRoutes");
@@ -14,15 +14,35 @@ const adminController = require("./controller/adminController");
 
 const app = express();
 
-// Middleware
-app.use(cors());
+app.use(cors({
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:5000',
+            'https://mwavuli-photographer.vercel.app',
+            'https://mwavuli-photographer.vercel.app:5000',
+        ];
+        
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+            callback(null, true);
+        } else {
+            console.log('Origin not allowed:', origin);
+            callback(null, true);
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
-// Serve uploaded media
 const path = require("path");
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const uploadsPath = path.join(__dirname, "uploads");
+app.use("/uploads", express.static(uploadsPath));
 
-// API routes
 app.use("/api/admin", adminRoutes);
 app.use("/api/photos", photoRoutes);
 app.use("/api/bookings", bookingRoutes);
@@ -30,8 +50,23 @@ app.use("/api/messages", require("./routes/messageRoutes"));
 app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/projects", projectRoutes);
 
-// Serve frontend files (index.html, gallery.html, admin/*, css, js, etc.)
-app.use(express.static(path.join(__dirname, "..")));
+app.get("/api/health", (req, res) => {
+    res.json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, "..")));
+    
+    app.get('*', (req, res) => {
+        if (req.path.startsWith('/api/')) return;
+        if (req.path.startsWith('/uploads/')) return;
+        
+        const indexPath = path.join(__dirname, "..", "index.html");
+        res.sendFile(indexPath);
+    });
+} else {
+    app.use(express.static(path.join(__dirname, "..")));
+}
 
 const PORT = process.env.PORT || 5000;
 
@@ -41,6 +76,7 @@ async function start() {
         await adminController.seedAdmin();
         app.listen(PORT, '0.0.0.0', () => {
             console.log(`Server is running on port ${PORT}`);
+            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
         });
     } catch (err) {
         console.error("Failed to start server:", err);
@@ -50,3 +86,9 @@ async function start() {
 
 start();
 
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    process.exit(0);
+});
+
+module.exports = app;
