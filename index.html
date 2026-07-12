@@ -392,11 +392,10 @@
 
     <!-- Image Lightbox -->
     <div class="lightbox" id="lightbox">
-
         <span class="close">&times;</span>
-
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous">&lt;</button>
+        <button class="lightbox-nav lightbox-next" aria-label="Next">&gt;</button>
         <img id="lightbox-img" src="" alt="Preview">
-
     </div>
 
     <footer class="footer">
@@ -430,8 +429,10 @@
         <p>&copy; 2026 MWAVULI PHOTOGRAPHY. All Rights Reserved.</p>
 
     </footer>
-    <script src="script.js"></script>
-    <script src="gallery.js"></script>
+    <script src="script.js?v=4"></script>
+    <script src="lightbox.js?v=4"></script>
+    <script src="bulk-actions.js?v=4"></script>
+    <script src="gallery.js?v=4"></script>
     <script>
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("sw.js").catch(() => { });

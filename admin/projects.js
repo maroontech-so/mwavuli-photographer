@@ -74,14 +74,20 @@ form.addEventListener("submit", async (e) => {
         closeModal();
         loadProjects();
     } catch (err) {
-        alert(err.message || "Something went wrong");
+        window.showToast(err.message || "Something went wrong", "error");
     }
 });
 
 async function deleteProject(id) {
-    if (!confirm("Delete this project? Photos will no longer be linked to it.")) return;
-    await apiFetch(`${API}/api/projects/${id}`, { method: "DELETE" });
-    loadProjects();
+    window.confirmDelete(
+        "Delete this project?",
+        "Photos will no longer be linked to it. This cannot be undone.",
+        async () => {
+            await apiFetch(`${API}/api/projects/${id}`, { method: "DELETE" });
+            window.showToast("Project deleted", "success");
+            loadProjects();
+        }
+    );
 }
 
 function renderProjects() {
@@ -241,11 +247,17 @@ function renderProjectFiles(photos, project) {
 
     projectFilesGrid.querySelectorAll(".delete-file-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
-            if (!confirm("Remove this file from the project?")) return;
-            const photoId = btn.dataset.id;
-            await apiFetch(`${API}/api/photos/${photoId}`, { method: "DELETE" });
-            loadProjectPhotos(currentProjectId);
-            loadProjects();
+            window.confirmDelete(
+                "Remove this file?",
+                "This will permanently delete the file from this project.",
+                async () => {
+                    const photoId = btn.dataset.id;
+                    await apiFetch(`${API}/api/photos/${photoId}`, { method: "DELETE" });
+                    window.showToast("File removed", "success");
+                    loadProjectPhotos(currentProjectId);
+                    loadProjects();
+                }
+            );
         });
     });
 }
@@ -301,13 +313,9 @@ pUploadFiles.addEventListener("change", renderPUploadFiles);
 projectUploadForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    const category = document.getElementById("pUploadCategory")?.value || "";
     const title = document.getElementById("pUploadTitle")?.value || "";
+    const location = document.getElementById("pUploadLocation")?.value || "";
 
-    if (!category) {
-        setPMessage("Please choose a category.", "error");
-        return;
-    }
     if (!pUploadFiles.files.length) {
         setPMessage("Please select at least one file.", "error");
         return;
@@ -315,7 +323,7 @@ projectUploadForm.addEventListener("submit", (e) => {
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("category", category);
+    formData.append("category", "General");
     formData.append("project", currentProjectId);
     [...pUploadFiles.files].forEach(f => formData.append("images", f));
 
@@ -341,7 +349,7 @@ projectUploadForm.addEventListener("submit", (e) => {
         }
 
         if (xhr.status >= 200 && xhr.status < 300 && data.success) {
-            setPMessage(`${data.message}`, "success");
+            window.showToast(`${data.message}`, "success");
             projectUploadForm.reset();
             pFileList.innerHTML = "";
             pProgressWrap.hidden = true;

@@ -28,11 +28,13 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-                bookingMessage.style.color = data.success ? "green" : "red";
-                bookingMessage.textContent = data.success
-                    ? "Thank you! Your request was sent. We'll be in touch soon."
-                    : (data.message || "Something went wrong.");
-                if (data.success) contactForm.reset();
+                if (data.success) {
+                    window.showToast("Thank you! Your booking request was sent. We'll be in touch soon.", "success");
+                    contactForm.reset();
+                } else {
+                    bookingMessage.style.color = "red";
+                    bookingMessage.textContent = data.message || "Something went wrong.";
+                }
             } catch (err) {
                 bookingMessage.style.color = "red";
                 bookingMessage.textContent = "Network error. Please try again.";
@@ -101,15 +103,13 @@
         link.addEventListener("click", closeSidebar);
     });
 
-    // Featured projects carousel
+    // Featured projects carousel - smooth infinite scroll
     const carouselTrack = document.getElementById("featuredCarousel");
     const prevBtn = document.getElementById("carouselPrev");
     const nextBtn = document.getElementById("carouselNext");
-    let autoscrollInterval = null;
 
     if (carouselTrack) {
         let projects = [];
-        let currentIndex = 0;
         let slidesPerView = 3;
 
         function updateSlidesPerView() {
@@ -122,13 +122,28 @@
             }
         }
 
+        function createCard(project) {
+            return `
+                <a class="featured-card" href="project.html?id=${project._id}">
+                    <div class="project-cover">
+                        ${project.cover
+                            ? `<img src="${API}/uploads/${project.cover}" alt="${escapeHtml(project.title)}">`
+                            : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`}
+                        <div class="project-overlay">
+                            <h3>${escapeHtml(project.title)}</h3>
+                            <p>${escapeHtml(project.location || "")}</p>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+
         async function loadProjects() {
             try {
                 const res = await fetch(`${API}/api/projects`);
                 const data = await res.json();
                 projects = data.projects || [];
                 renderCarousel();
-                startAutoscroll();
             } catch (err) {
                 console.error("Failed to load projects", err);
                 carouselTrack.innerHTML = "<p class='gallery-empty'>Could not load projects.</p>";
@@ -141,86 +156,41 @@
                 return;
             }
 
-            carouselTrack.innerHTML = projects.map(p => `
-                <a class="featured-card" href="project.html?id=${p._id}">
-                    <div class="project-cover">
-                        ${p.cover
-                            ? `<img src="${API}/uploads/${p.cover}" alt="${p.title}">`
-                            : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`}
-                        <div class="project-overlay">
-                            <h3>${escapeHtml(p.title)}</h3>
-                            <p>${escapeHtml(p.location || "")}</p>
-                        </div>
-                    </div>
-                </a>
-            `).join("");
-
             updateSlidesPerView();
-            currentIndex = 0;
-            updateCarouselPosition();
-        }
 
-        function updateCarouselPosition() {
-            const cards = carouselTrack.querySelectorAll(".featured-card");
-            if (!cards.length) return;
-
-            const card = cards[0];
-            const cardWidth = card.offsetWidth;
-            const gap = 24;
-            const maxIndex = Math.max(0, projects.length - slidesPerView);
-            currentIndex = Math.min(currentIndex, maxIndex);
-            currentIndex = Math.max(currentIndex, 0);
-
-            const offset = currentIndex * (cardWidth + gap);
-            carouselTrack.style.transform = `translateX(-${offset}px)`;
-        }
-
-        function startAutoscroll() {
-            stopAutoscroll();
-            autoscrollInterval = setInterval(() => {
-                const cards = carouselTrack.querySelectorAll(".featured-card");
-                if (!cards.length) return;
-                const maxIndex = Math.max(0, projects.length - slidesPerView);
-                currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
-                updateCarouselPosition();
-            }, 4000);
-        }
-
-        function stopAutoscroll() {
-            if (autoscrollInterval) {
-                clearInterval(autoscrollInterval);
-                autoscrollInterval = null;
-            }
+            const cards = projects.map(createCard).join("");
+            carouselTrack.innerHTML = cards + cards;
+            carouselTrack.classList.add("animate");
         }
 
         if (prevBtn) {
             prevBtn.addEventListener("click", () => {
-                currentIndex--;
-                updateCarouselPosition();
-                stopAutoscroll();
-                startAutoscroll();
+                carouselTrack.classList.remove("animate");
+                carouselTrack.style.transition = "transform 0.5s ease";
+                carouselTrack.style.transform = `translateX(${carouselTrack.offsetWidth / 2}px)`;
+                setTimeout(() => {
+                    carouselTrack.style.transition = "none";
+                    carouselTrack.style.transform = "translateX(0)";
+                    carouselTrack.classList.add("animate");
+                }, 500);
             });
         }
 
         if (nextBtn) {
             nextBtn.addEventListener("click", () => {
-                currentIndex++;
-                updateCarouselPosition();
-                stopAutoscroll();
-                startAutoscroll();
+                carouselTrack.classList.remove("animate");
+                carouselTrack.style.transition = "transform 0.5s ease";
+                carouselTrack.style.transform = `translateX(-${carouselTrack.offsetWidth / 2}px)`;
+                setTimeout(() => {
+                    carouselTrack.style.transition = "none";
+                    carouselTrack.style.transform = "translateX(0)";
+                    carouselTrack.classList.add("animate");
+                }, 500);
             });
         }
 
-        carouselTrack.addEventListener("mouseenter", stopAutoscroll);
-        carouselTrack.addEventListener("mouseleave", startAutoscroll);
-        carouselTrack.addEventListener("touchstart", stopAutoscroll, { passive: true });
-        carouselTrack.addEventListener("touchend", () => {
-            setTimeout(startAutoscroll, 3000);
-        });
-
         window.addEventListener("resize", () => {
             updateSlidesPerView();
-            updateCarouselPosition();
         });
 
         loadProjects();

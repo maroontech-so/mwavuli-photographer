@@ -78,6 +78,7 @@ if (projectCollectionsEl || generalGallery) {
         }
 
         const mosaic = ["big", "", "tall", "", "wide", "", "tall", "", "", "wide"];
+        const imageSources = [];
 
         photos.forEach((photo, i) => {
             const span = mosaic[i % mosaic.length];
@@ -87,35 +88,23 @@ if (projectCollectionsEl || generalGallery) {
                    </video>`
                 : `<img src="${API}/uploads/${photo.file}" alt="${photo.title}" draggable="false">`;
 
+            imageSources.push(`${API}/uploads/${photo.file}`);
+
             generalGallery.innerHTML += `
             <div class="gallery-item ${span}">
                 ${media}
             </div>`;
         });
 
-        wireLightbox();
-        protectImages();
-    }
-
-    function wireLightbox() {
-        const lightbox = document.getElementById("lightbox");
-        if (!lightbox) return;
-        const lightboxImg = document.getElementById("lightbox-img");
-        const closeBtn = document.querySelector(".close");
-
-        generalGallery.querySelectorAll(".gallery-item img").forEach(image => {
-            image.addEventListener("click", () => {
-                lightbox.style.display = "flex";
-                lightboxImg.src = image.src;
+        const images = generalGallery.querySelectorAll(".gallery-item img");
+        images.forEach((img, idx) => {
+            img.addEventListener("click", () => {
+                const srcArray = Array.from(images).map(i => i.src);
+                window.openLightbox(srcArray, idx);
             });
         });
 
-        if (closeBtn) {
-            closeBtn.addEventListener("click", () => lightbox.style.display = "none");
-        }
-        lightbox.addEventListener("click", (e) => {
-            if (e.target === lightbox) lightbox.style.display = "none";
-        });
+        protectImages();
     }
 
     function protectImages() {
@@ -134,7 +123,6 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
-// Global guard: block right-click on any gallery image across the site
 document.addEventListener("contextmenu", (e) => {
     if (e.target.closest(".gallery-item")) e.preventDefault();
 });

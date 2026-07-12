@@ -4,6 +4,24 @@
     margin:20px 0;
     border-radius:12px;
     box-shadow:0 10px 20px rgba(0,0,0,.08);
+    position: relative;
+}
+
+.card-checkbox{
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    z-index: 5;
+    accent-color: #C89B3C;
+}
+
+.message-card.selected{
+    outline: 3px solid #C89B3C;
+    outline-offset: -3px;
+    border-radius: 12px;
 }
 
 .message-card h3{

@@ -8,7 +8,6 @@ const progressWrap = document.getElementById("progressWrap");
 const progressFill = document.getElementById("progressFill");
 const progressPct = document.getElementById("progressPct");
 const submitBtn = document.getElementById("submitBtn");
-const projectSelect = document.getElementById("project");
 
 function formatSize(bytes) {
     if (bytes < 1024) return bytes + " B";
@@ -58,37 +57,15 @@ function setProgress(pct) {
     progressPct.textContent = Math.round(pct) + "%";
 }
 
-async function loadProjects() {
-    try {
-        const res = await fetch(`${API}/api/projects`);
-        const data = await res.json();
-        const projects = data.projects || [];
-        projectSelect.innerHTML = '<option value="">None (general gallery)</option>' +
-            projects.map(p => `<option value="${p._id}">${p.title}</option>`).join("");
-    } catch (err) {
-        console.error("Failed to load projects", err);
-    }
-}
-
-loadProjects();
-
 form.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    const category = document.getElementById("category").value;
-    if (!category) {
-        setMessage("Please choose a category.", "error");
-        return;
-    }
     if (!fileInput.files.length) {
         setMessage("Please select at least one file.", "error");
         return;
     }
 
     const formData = new FormData();
-    formData.append("title", document.getElementById("title").value);
-    formData.append("category", category);
-    formData.append("project", projectSelect.value);
     [...fileInput.files].forEach(f => formData.append("images", f));
 
     const token = getToken();
@@ -113,15 +90,14 @@ form.addEventListener("submit", (e) => {
         }
 
         if (xhr.status >= 200 && xhr.status < 300 && data.success) {
-            setMessage(
-                `${data.message}. They now appear on the homepage gallery.`,
-                "success"
-            );
+            window.showToast(`${data.message}. They now appear on the homepage gallery.`, "success");
             form.reset();
             fileList.innerHTML = "";
             progressWrap.hidden = true;
             progressFill.style.width = "0%";
-            loadProjects();
+            setTimeout(() => {
+                window.location.href = "gallery.html";
+            }, 1200);
         } else {
             setMessage(data.message || "Upload failed. Please try again.", "error");
         }

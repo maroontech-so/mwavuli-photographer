@@ -136,17 +136,11 @@
             <h2 id="filesModalTitle">Project Files</h2>
 
             <form id="projectUploadForm" class="panel-form" enctype="multipart/form-data">
-                <label for="pUploadTitle">Title Prefix <span class="hint">(optional)</span></label>
+                <label for="pUploadTitle">Event title <span class="hint">(optional)</span></label>
                 <input type="text" id="pUploadTitle" placeholder="e.g. Brian & Faith Wedding">
 
-                <label for="pUploadCategory">Category</label>
-                <select id="pUploadCategory" required>
-                    <option value="">Choose Category</option>
-                    <option>Wedding</option>
-                    <option>Portrait</option>
-                    <option>Graduation</option>
-                    <option>Event</option>
-                </select>
+                <label for="pUploadLocation">Location <span class="hint">(optional)</span></label>
+                <input type="text" id="pUploadLocation" placeholder="e.g. Nairobi">
 
                 <label for="pUploadFiles">Add Photos / Videos</label>
                 <input type="file" id="pUploadFiles" accept="image/*,video/*" multiple>
@@ -172,9 +166,10 @@
         </div>
     </div>
 
-    <script src="auth.js?v=3"></script>
-    <script src="admin-ui.js?v=3"></script>
-    <script src="projects.js?v=3"></script>
+    <script src="auth.js?v=4"></script>
+    <script src="admin-ui.js?v=4"></script>
+    <script src="bulk-actions.js?v=4"></script>
+    <script src="projects.js?v=4"></script>
 
 </body>
 

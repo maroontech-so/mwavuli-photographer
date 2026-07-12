@@ -32,7 +32,7 @@
                         <rect x="3" y="14" width="7" height="7" />
                     </svg>
                     Dashboard</a></li>
-            <li><a href="upload.html">
+            <li><a href="upload.html" class="active">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -56,15 +56,6 @@
                         <polyline points="21 15 16 10 5 21" />
                     </svg>
                     Projects</a></li>
-            <li><a href="bookings.html">
-                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                        <line x1="16" y1="2" x2="16" y2="6" />
-                        <line x1="8" y1="2" x2="8" y2="6" />
-                        <line x1="3" y1="10" x2="21" y2="10" />
-                    </svg>
-                    Bookings</a></li>
             <li><a href="messages.html">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -105,28 +96,11 @@
         <div class="page-header">
             <div>
                 <h1>Upload Media</h1>
-                <p>Add photos or videos to your portfolio gallery.</p>
+                <p>Add photos or videos to your general gallery.</p>
             </div>
         </div>
 
         <form id="uploadForm" class="panel-form" enctype="multipart/form-data">
-
-            <label for="title">Title Prefix <span class="hint">(optional)</span></label>
-            <input type="text" id="title" placeholder="e.g. Brian & Faith Wedding">
-
-            <label for="category">Category</label>
-            <select id="category" required>
-                <option value="">Choose Category</option>
-                <option>Wedding</option>
-                <option>Portrait</option>
-                <option>Graduation</option>
-                <option>Event</option>
-            </select>
-
-            <label for="project">Project <span class="hint">(optional)</span></label>
-            <select id="project">
-                <option value="">None (general gallery)</option>
-            </select>
 
             <label for="images">Media Files <span class="hint">(images or videos, multiple allowed)</span></label>
             <input type="file" id="images" accept="image/*,video/*" multiple required>
@@ -148,9 +122,10 @@
 
     </div>
 
-    <script src="auth.js?v=3"></script>
-    <script src="admin-ui.js?v=3"></script>
-    <script src="upload.js?v=3"></script>
+    <script src="auth.js?v=4"></script>
+    <script src="admin-ui.js?v=4"></script>
+    <script src="bulk-actions.js?v=4"></script>
+    <script src="upload.js?v=4"></script>
 
 </body>
 

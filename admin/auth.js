@@ -15,15 +15,13 @@
             return window.API_BASE;
         }
 
-        const isHosted = window.location.hostname.includes('vercel.app') ||
-                        window.location.hostname.includes('vercel.com') ||
-                        window.location.hostname.includes('onrender.com');
+        const hostname = window.location.hostname;
         
-        if (isHosted) {
-            return window.location.origin;
+        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+            return 'http://localhost:5000';
         }
-
-        return 'http://localhost:5000';
+        
+        return window.location.origin;
     }
 
     try {

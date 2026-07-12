@@ -62,6 +62,8 @@
     <!-- Image Lightbox -->
     <div class="lightbox" id="lightbox">
         <span class="close">&times;</span>
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous">&lt;</button>
+        <button class="lightbox-nav lightbox-next" aria-label="Next">&gt;</button>
         <img id="lightbox-img" src="" alt="Preview">
     </div>
 
@@ -86,6 +88,7 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="lightbox.js"></script>
     <script src="gallery.js"></script>
     <script>
         if ("serviceWorker" in navigator) {

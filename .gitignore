@@ -7,3 +7,4 @@ node_modules/
 # Uploaded media (keep the folder, ignore contents)
 server/uploads/*
 !server/uploads/.gitkeep
+server/uploads/
