@@ -3,15 +3,27 @@
     const TOKEN_KEY = "adminToken";
 
     function getToken() {
-        return localStorage.getItem(TOKEN_KEY);
+        try {
+            return localStorage.getItem(TOKEN_KEY);
+        } catch {
+            return null;
+        }
     }
 
     function setToken(token) {
-        localStorage.setItem(TOKEN_KEY, token);
+        try {
+            localStorage.setItem(TOKEN_KEY, token);
+        } catch {
+            console.warn("localStorage unavailable — token not persisted");
+        }
     }
 
     function logout() {
-        localStorage.removeItem(TOKEN_KEY);
+        try {
+            localStorage.removeItem(TOKEN_KEY);
+        } catch {
+            // ignore
+        }
         window.location.href = "login.html";
     }
 

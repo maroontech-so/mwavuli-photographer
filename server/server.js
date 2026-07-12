@@ -13,17 +13,12 @@ const adminController = require("./controller/adminController");
 
 const app = express();
 
-// Connect Database
-connectDB();
-adminController.seedAdmin();
-
-const path = require("path");
-
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Serve uploaded media
+const path = require("path");
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // API routes
@@ -38,7 +33,18 @@ app.use(express.static(path.join(__dirname, "..")));
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+async function start() {
+    try {
+        await connectDB();
+        await adminController.seedAdmin();
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (err) {
+        console.error("Failed to start server:", err);
+        process.exit(1);
+    }
+}
+
+start();
 
