@@ -16,10 +16,7 @@ exports.uploadPhoto = async (req, res) => {
         }
 
         if (!category) {
-            return res.status(400).json({
-                success: false,
-                message: "Please choose a category."
-            });
+            category = "General";
         }
 
         if (project) {
