@@ -1,4 +1,4 @@
-const API = "";
+const API = "http://localhost:5000";
 
 const gallery = document.getElementById("gallery");
 

@@ -1,5 +1,5 @@
 (function () {
-    const API = "";
+    const API = "http://localhost:5000";
 
     // Contact form -> creates a booking/message
     const contactForm = document.getElementById("contactForm");
