@@ -36,14 +36,6 @@ app.use("/api/testimonials", testimonialRoutes);
 // Serve frontend files (index.html, gallery.html, admin/*, css, js, etc.)
 app.use(express.static(path.join(__dirname, "..")));
 
-// For any non-API route, serve index.html so the site works as a single-page app
-app.get("*", (req, res) => {
-    if (req.path.startsWith("/api/")) {
-        return res.status(404).json({ success: false, message: "API endpoint not found" });
-    }
-    res.sendFile(path.join(__dirname, "..", "index.html"));
-});
-
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -1,5 +1,5 @@
 (function () {
-    const API = "http://localhost:5000";
+    const API = window.location.port === '5000' ? '' : (window.location.protocol === 'file:' ? 'http://localhost:5000' : `${window.location.protocol}//${window.location.hostname}:5000`);
 
     // Contact form -> creates a booking/message
     const contactForm = document.getElementById("contactForm");

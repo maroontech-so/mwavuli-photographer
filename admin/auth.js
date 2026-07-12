@@ -1,5 +1,5 @@
 (function () {
-    const API_BASE = "http://localhost:5000";
+    const API_BASE = window.location.port === '5000' ? '' : (window.location.protocol === 'file:' ? 'http://localhost:5000' : `${window.location.protocol}//${window.location.hostname}:5000`);
     const TOKEN_KEY = "adminToken";
 
     function getToken() {
