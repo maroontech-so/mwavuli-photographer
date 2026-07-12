@@ -1,10 +1,13 @@
 (function () {
-    const API = window.API_BASE
-        || (!window.location.port || window.location.port === '5000'
-            ? ''
-            : (window.location.protocol === 'file:'
-                ? 'http://localhost:5000'
-                : `${window.location.protocol}//${window.location.hostname}:5000`));
+    const API = (function () {
+        if (window.API_BASE) return window.API_BASE;
+        const hostname = window.location.hostname;
+        const port = window.location.port;
+        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
+            return port === '5000' || port === '' ? '' : 'http://localhost:5000';
+        }
+        return window.location.origin;
+    })();
 
     // Contact form -> creates a booking/message
     const contactForm = document.getElementById("contactForm");
