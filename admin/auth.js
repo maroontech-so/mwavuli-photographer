@@ -10,17 +10,14 @@
         }
     }
 
-    let API_BASE;
-    try {
-        API_BASE = window.location.port === '5000'
+    // Frontend uses window.API_BASE if set (e.g. injected by hosting platform),
+    // otherwise falls back to service-worker/domain-based detection.
+    const API_BASE = window.API_BASE
+        || (!window.location.port || window.location.port === '5000'
             ? ''
             : (window.location.protocol === 'file:'
                 ? 'http://localhost:5000'
-                : `${window.location.protocol}//${window.location.hostname}:5000`);
-    } catch {
-        API_BASE = '/api';
-        console.warn("Could not detect API_BASE, using relative path");
-    }
+                : `${window.location.protocol}//${window.location.hostname}:5000`));
 
     try {
         localStorage.setItem("test", "1");
@@ -62,5 +59,5 @@
     }
 
     window.adminAuth = { API: API_BASE, getToken, setToken, logout, apiFetch };
-    console.log("adminAuth loaded, API_BASE =", API_BASE);
+    console.log("adminAuth loaded, API_BASE =", API_BASE, "(override via window.API_BASE)");
 })();

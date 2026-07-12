@@ -34,8 +34,8 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="gallery.html">Portfolio</a></li>
+                <li><a href="projects.html">Projects</a></li>
                 <li><a href="#services">Services</a></li>
-                <li><a href="#projects">Projects</a></li>
                 <li><a href="#testimonials">Testimonials</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li class="mobile-cta"><a href="#contact" class="btn">Book Now</a></li>
@@ -191,53 +191,8 @@
         <h2>Featured Projects</h2>
         <p>Every project tells a unique story.</p>
 
-        <div class="projects-container">
-
-            <div class="project-card">
-
-                <img src="assets/images/Weddings/wedding1.jpg" alt="Wedding">
-
-                <div class="project-info">
-
-                    <span class="category">Wedding</span>
-
-                    <h3>Brian & Faith Wedding</h3>
-
-                    <p class="location"><i class="fa-solid fa-location-dot"></i> Karen, Nairobi</p>
-
-                    <p>
-                        A beautiful outdoor wedding with family and friends
-                        celebrating an unforgettable day.
-                    </p>
-
-                    <a href="#portfolio" class="project-btn">View Gallery</a>
-
-                </div>
-
-            </div>
-
-            <div class="project-card">
-
-                <img src="assets/images/Graduation/Graduation.jpg" alt="Graduation">
-
-                <div class="project-info">
-
-                    <span class="category">Graduation</span>
-
-                    <h3>Mercy Graduation Shoot</h3>
-
-                    <p class="location"><i class="fa-solid fa-location-dot"></i> USIU-A</p>
-
-                    <p>
-                        Capturing a memorable graduation celebration with elegant portraits.
-                    </p>
-
-                    <a href="#portfolio" class="project-btn">View Gallery</a>
-
-                </div>
-
-            </div>
-
+        <div class="projects-container" id="projectsContainer">
+            <p class="gallery-empty">Loading projects...</p>
         </div>
 
     </section>
@@ -407,8 +362,7 @@
 
             <a href="#"><i class="fa-brands fa-instagram"></i></a>
 
-            <a href="#"><i class="fa-brands fa-facebook"></i></a>
-
+            
             <a href="#"><i class="fa-brands fa-tiktok"></i></a>
 
             <a href="https://wa.me/254769578232" target="_blank">
@@ -422,6 +376,7 @@
     </footer>
     <script src="script.js"></script>
     <script src="gallery.js"></script>
+    <script src="projects.js"></script>
     <script>
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("sw.js").catch(() => { });

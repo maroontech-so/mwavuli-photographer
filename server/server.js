@@ -9,6 +9,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const photoRoutes = require("./routes/photoRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const testimonialRoutes = require("./routes/testimonialRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 const adminController = require("./controller/adminController");
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/photos", photoRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/messages", require("./routes/messageRoutes"));
 app.use("/api/testimonials", testimonialRoutes);
+app.use("/api/projects", projectRoutes);
 
 // Serve frontend files (index.html, gallery.html, admin/*, css, js, etc.)
 app.use(express.static(path.join(__dirname, "..")));

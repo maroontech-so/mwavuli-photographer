@@ -399,13 +399,12 @@ nav ul li a:hover {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     grid-auto-rows: 220px;
     grid-auto-flow: dense;
-    gap: 16px;
+    gap: 1px;
 }
 
 .gallery-item {
     position: relative;
     overflow: hidden;
-    border-radius: var(--radius);
     cursor: pointer;
     box-shadow: var(--shadow);
 }
@@ -1140,4 +1139,254 @@ section p {
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
+}
+
+/* Projects page */
+.projects-page {
+    padding-top: 120px;
+    padding-bottom: 80px;
+    min-height: 80vh;
+}
+
+.page-head {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 0 8%;
+}
+
+.back-link {
+    display: inline-block;
+    color: var(--gold);
+    text-decoration: none;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    padding: 0 8%;
+}
+
+.project-card {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    display: block;
+    text-decoration: none;
+    color: #fff;
+    box-shadow: var(--shadow);
+    transition: .3s;
+}
+
+.project-card:hover {
+    transform: translateY(-8px);
+}
+
+.project-cover {
+    width: 100%;
+    height: 100%;
+}
+
+.project-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.project-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #11151c, #1c2330);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    color: var(--gold);
+}
+
+.project-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.75), rgba(0,0,0,.1));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+}
+
+.project-overlay h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.project-overlay p {
+    font-size: 14px;
+    opacity: .85;
+}
+
+/* Project detail page gallery */
+.project-page .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0 8%;
+}
+
+/* Admin projects page */
+.project-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.project-admin-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.project-admin-thumb {
+    width: 100%;
+    height: 180px;
+    background: #f5f5f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.project-admin-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-admin-thumb span {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.project-admin-info {
+    padding: 16px;
+    flex: 1;
+}
+
+.project-admin-info h3 {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.project-admin-info p {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.project-admin-actions {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 16px;
+}
+
+.project-admin-actions button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.project-admin-actions button:first-child {
+    background: var(--gold);
+    color: #fff;
+}
+
+.project-admin-actions button:last-child {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 0;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 420px;
+    color: var(--ink);
+}
+
+.modal-card h2 {
+    margin-bottom: 16px;
+    font-size: 20px;
+}
+
+.modal-card input,
+.modal-card textarea {
+    width: 100%;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-actions button {
+    width: auto;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.modal-actions button[type="button"] {
+    background: #e5e7eb;
+    color: var(--ink);
+}
+
+.modal-actions button[type="submit"] {
+    background: var(--gold);
+    color: #fff;
 }

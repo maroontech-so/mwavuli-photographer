@@ -1,10 +1,11 @@
 const Photo = require("../models/Photo");
+const Project = require("../models/Project");
 const path = require("path");
 
 // Upload one or more media files
 exports.uploadPhoto = async (req, res) => {
     try {
-        const { title, category } = req.body;
+        const { title, category, project } = req.body;
         const files = req.files;
 
         if (!files || !files.length) {
@@ -19,6 +20,16 @@ exports.uploadPhoto = async (req, res) => {
                 success: false,
                 message: "Please choose a category."
             });
+        }
+
+        if (project) {
+            const projectExists = await Project.findById(project);
+            if (!projectExists) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Selected project does not exist."
+                });
+            }
         }
 
         const baseTitle = (title && title.trim())
@@ -39,7 +50,8 @@ exports.uploadPhoto = async (req, res) => {
                 title: itemTitle,
                 category,
                 file: file.filename,
-                mediaType
+                mediaType,
+                project: project || null
             };
         });
 
@@ -81,13 +93,14 @@ exports.updatePhoto = async (req, res) => {
 
     try {
 
-        const { title, category } = req.body;
+        const { title, category, project } = req.body;
 
         const photo = await Photo.findByIdAndUpdate(
             req.params.id,
             {
                 title,
-                category
+                category,
+                ...(project !== undefined ? { project } : {})
             },
             { new: true }
         );

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messages</title>
+    <title>Projects</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="messages.css">
+    <link rel="stylesheet" href="projects.css">
 </head>
 
 <body>
@@ -49,7 +49,7 @@
                         <polyline points="21 15 16 10 5 21" />
                     </svg>
                     Media Library</a></li>
-            <li><a href="projects.html">
+            <li><a href="projects.html" class="active">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -103,15 +103,37 @@
 
     <div class="main">
 
-        <h1>Contact Messages</h1>
+        <div class="page-header">
+            <div>
+                <h1>Projects</h1>
+                <p>Create and manage portfolio projects.</p>
+            </div>
+            <button id="newProjectBtn" class="action-btn">+ New Project</button>
+        </div>
 
-        <div id="messageContainer"></div>
+        <div id="projectContainer" class="project-admin-grid"></div>
 
+    </div>
+
+    <div id="projectModal" class="modal hidden">
+        <div class="modal-card">
+            <h2 id="modalTitle">New Project</h2>
+            <form id="projectForm">
+                <input type="text" id="pTitle" placeholder="Project title" required>
+                <input type="text" id="pLocation" placeholder="Location (optional)">
+                <textarea id="pDescription" placeholder="Short description (optional)" rows="3"></textarea>
+                <input type="hidden" id="pId">
+                <div class="modal-actions">
+                    <button type="button" id="cancelBtn">Cancel</button>
+                    <button type="submit">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="auth.js"></script>
     <script src="admin-ui.js"></script>
-    <script src="messages.js"></script>
+    <script src="projects.js"></script>
 
 </body>
 

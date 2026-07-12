@@ -1,4 +1,9 @@
-const API = window.location.port === '5000' ? '' : (window.location.protocol === 'file:' ? 'http://localhost:5000' : `${window.location.protocol}//${window.location.hostname}:5000`);
+const API = window.API_BASE
+    || (!window.location.port || window.location.port === '5000'
+        ? ''
+        : (window.location.protocol === 'file:'
+            ? 'http://localhost:5000'
+            : `${window.location.protocol}//${window.location.hostname}:5000`));
 
 const gallery = document.getElementById("gallery");
 

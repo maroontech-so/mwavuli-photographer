@@ -21,6 +21,12 @@ const photoSchema = new mongoose.Schema({
     file:{
         type:String,
         required:true
+    },
+
+    project:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Project",
+        default: null
     }
 
 },{
