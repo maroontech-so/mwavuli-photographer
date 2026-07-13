@@ -19,6 +19,7 @@ const submitBtn = document.getElementById("heroSubmitBtn");
 const progressWrap = document.getElementById("heroProgressWrap");
 const progressFill = document.getElementById("heroProgressFill");
 const progressPct = document.getElementById("heroProgressPct");
+const progressStatus = document.getElementById("heroProgressStatus");
 
 function setMsg(el, text, type) {
     el.textContent = text;
@@ -174,13 +175,11 @@ form.addEventListener("submit", (e) => {
     if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
     xhr.upload.addEventListener("progress", (ev) => {
-        if (ev.lengthComputable) {
-            const pct = Math.round((ev.loaded / ev.total) * 100);
-            progressWrap.hidden = false;
-            progressFill.style.width = pct + "%";
-            progressPct.textContent = pct + "%";
-        }
+        if (ev.lengthComputable) setUploadProgress((ev.loaded / ev.total) * 100);
     });
+
+    // Network transfer finished; server is still saving the image(s).
+    xhr.upload.addEventListener("load", () => startProcessing());
 
     xhr.addEventListener("load", () => {
         submitBtn.disabled = false;
@@ -194,13 +193,14 @@ form.addEventListener("submit", (e) => {
         }
 
         if (xhr.status >= 200 && xhr.status < 300 && data.success) {
+            finishProgress();
             window.showToast(data.message || "Slides added", "success");
             form.reset();
             heroFileList.innerHTML = "";
-            progressWrap.hidden = true;
-            progressFill.style.width = "0%";
             loadHero();
+            setTimeout(hideProgress, 900);
         } else {
+            hideProgress();
             setMsg(heroMsg, data.message || "Upload failed.", "error");
         }
     });
@@ -208,12 +208,13 @@ form.addEventListener("submit", (e) => {
     xhr.addEventListener("error", () => {
         submitBtn.disabled = false;
         submitBtn.textContent = "Upload Images";
+        hideProgress();
         setMsg(heroMsg, "Network error. Is the server running?", "error");
     });
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Uploading...";
-    setProgress(0);
+    showProgress();
     xhr.send(formData);
 });
 
@@ -235,10 +236,48 @@ document.getElementById("saveSettingsBtn").addEventListener("click", async () =>
     }
 });
 
-function setProgress(pct) {
+function showProgress() {
     progressWrap.hidden = false;
+    progressWrap.classList.remove("hiding", "processing", "complete");
+    progressFill.style.width = "0%";
+    progressPct.textContent = "0%";
+    progressStatus.textContent = "Uploading…";
+}
+
+function setUploadProgress(pct) {
+    // Reserve the last 10% for server-side saving so the bar stays honest.
+    pct = Math.max(0, Math.min(90, pct * 0.9));
+    progressWrap.classList.remove("processing", "complete");
     progressFill.style.width = pct + "%";
     progressPct.textContent = Math.round(pct) + "%";
+    progressStatus.textContent = "Uploading…";
+}
+
+function startProcessing() {
+    progressWrap.classList.add("processing");
+    progressWrap.classList.remove("complete");
+    progressFill.style.width = "100%";
+    progressPct.textContent = "100%";
+    progressStatus.textContent = "Saving…";
+}
+
+function finishProgress() {
+    progressWrap.classList.remove("processing");
+    progressWrap.classList.add("complete");
+    progressFill.style.width = "100%";
+    progressPct.textContent = "✓";
+    progressStatus.textContent = "Done";
+}
+
+function hideProgress() {
+    progressWrap.classList.add("hiding");
+    setTimeout(() => {
+        progressWrap.hidden = true;
+        progressWrap.classList.remove("hiding", "processing", "complete");
+        progressFill.style.width = "0%";
+        progressPct.textContent = "0%";
+        progressStatus.textContent = "";
+    }, 450);
 }
 
 loadHero();

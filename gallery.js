@@ -18,8 +18,36 @@ function cldUrl(url, t) {
 const projectCollectionsEl = document.getElementById("projectCollections");
 const generalGallery = document.getElementById("generalGallery");
 
+const MOSAIC = ["big", "", "tall", "", "wide", "", "tall", "", "", "wide"];
+
+// Show a modern shimmer placeholder the instant the page renders, so the
+// gallery never appears broken/empty while the API responds.
+function showSkeleton() {
+    if (projectCollectionsEl) {
+        projectCollectionsEl.innerHTML = Array.from({ length: 4 }).map(() =>
+            `<div class="skel-card skel-shimmer"></div>`
+        ).join("");
+    }
+    if (generalGallery) {
+        generalGallery.innerHTML = MOSAIC.map(span =>
+            `<div class="gallery-item skel ${span}"><div class="skel-shimmer"></div></div>`
+        ).join("");
+    }
+}
+
+// Fisher–Yates shuffle (returns a new array).
+function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
 if (projectCollectionsEl || generalGallery) {
     async function loadGallery() {
+        showSkeleton();
         try {
             const [projectsRes, photosRes] = await Promise.all([
                 fetch(`${API}/api/projects`),
@@ -34,13 +62,15 @@ if (projectCollectionsEl || generalGallery) {
 
             const generalPhotos = allPhotos.filter(p => !p.project);
 
-            if (projectCollectionsEl) {
-                renderProjectCollections(projects);
-            }
+            // Every photo that belongs to a project, merged into the general
+            // gallery so the wall shows the full body of work...
+            const projectPhotos = allPhotos.filter(p => p.project);
 
-            if (generalGallery) {
-                renderGeneralGallery(generalPhotos);
-            }
+            // ...then shuffled so the layout feels fresh on each visit.
+            const combined = shuffle([...generalPhotos, ...projectPhotos]);
+
+            if (projectCollectionsEl) renderProjectCollections(projects);
+            if (generalGallery) renderGeneralGallery(combined);
         } catch (err) {
             console.error("Failed to load gallery", err);
             if (projectCollectionsEl) {
@@ -53,46 +83,40 @@ if (projectCollectionsEl || generalGallery) {
     }
 
     function renderProjectCollections(projects) {
-        projectCollectionsEl.innerHTML = "";
-
         if (!projects.length) {
             projectCollectionsEl.innerHTML = "<p class='gallery-empty'>No projects yet.</p>";
             return;
         }
 
-            projects.forEach(p => {
-            const card = document.createElement("a");
-            card.href = `project.html?id=${p._id}`;
-            card.className = "gallery-collection-card";
+        const cards = projects.map(p => {
             const cover = p.cover
                 ? `<img src="${cldUrl(mediaUrl(p.cover), "w_800,c_limit,q_auto,f_auto")}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">`
                 : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`;
-            card.innerHTML = `
-                <div class="collection-cover">
-                    ${cover}
-                    <div class="project-overlay">
-                        <h3>${escapeHtml(p.title)}</h3>
-                        <p>${escapeHtml(p.location || "")}</p>
+            return `
+                <a class="gallery-collection-card" href="project.html?id=${p._id}">
+                    <div class="collection-cover">
+                        ${cover}
+                        <div class="project-overlay">
+                            <h3>${escapeHtml(p.title)}</h3>
+                            <p>${escapeHtml(p.location || "")}</p>
+                        </div>
                     </div>
-                </div>
-            `;
-            projectCollectionsEl.appendChild(card);
+                </a>`;
         });
+        projectCollectionsEl.innerHTML = cards.join("");
     }
 
     function renderGeneralGallery(photos) {
-        generalGallery.innerHTML = "";
-
         if (!photos.length) {
-            generalGallery.innerHTML = "<p class='gallery-empty'>No general photos yet.</p>";
+            generalGallery.innerHTML = "<p class='gallery-empty'>No photos yet. Upload some from the admin panel.</p>";
             return;
         }
 
-        const mosaic = ["big", "", "tall", "", "wide", "", "tall", "", "", "wide"];
-        const imageSources = [];
-
-        photos.forEach((photo, i) => {
-            const span = mosaic[i % mosaic.length];
+        // Build the whole grid as one string and assign it once — appending via
+        // innerHTML += per item forces a full re-parse every iteration, which is
+        // what made the gallery feel slow with many images.
+        const parts = photos.map((photo, i) => {
+            const span = MOSAIC[i % MOSAIC.length];
             const thumbBase = mediaUrl(photo.thumbnail || photo.file);
             const thumbUrl = cldUrl(thumbBase, "w_640,c_limit,q_auto,f_auto");
             const fullUrl = cldUrl(mediaUrl(photo.file), "w_1600,c_limit,q_auto,f_auto");
@@ -105,24 +129,22 @@ if (projectCollectionsEl || generalGallery) {
                 ? `<video controls preload="none" poster="${thumbUrl}" draggable="false">
                         <source src="${fullUrl}" type="video/mp4">
                    </video>`
-                : `<img src="${thumbUrl}" srcset="${srcset}" sizes="(max-width:600px) 100vw, (max-width:1024px) 50vw, 33vw" alt="${photo.title}" data-full="${fullUrl}" loading="lazy" decoding="async" draggable="false">`;
+                : `<img src="${thumbUrl}" srcset="${srcset}" sizes="(max-width:600px) 100vw, (max-width:1024px) 50vw, 33vw" alt="${escapeHtml(photo.title)}" data-full="${fullUrl}" loading="lazy" decoding="async" draggable="false">`;
 
-            if (photo.mediaType === "photo") {
-                imageSources.push(fullUrl);
-            }
-
-            generalGallery.innerHTML += `
-            <div class="gallery-item ${span}">
-                ${media}
-            </div>`;
+            return `
+                <div class="gallery-item ${span}">
+                    ${media}
+                </div>`;
         });
+
+        generalGallery.innerHTML = parts.join("");
 
         const images = generalGallery.querySelectorAll(".gallery-item img");
         images.forEach((img, idx) => {
-                img.addEventListener("click", () => {
-                    const srcArray = Array.from(images).map(i => i.dataset.full || i.src);
-                    window.openLightbox(srcArray, idx);
-                });
+            img.addEventListener("click", () => {
+                const srcArray = Array.from(images).map(i => i.dataset.full || i.src);
+                window.openLightbox(srcArray, idx);
+            });
         });
 
         protectImages();

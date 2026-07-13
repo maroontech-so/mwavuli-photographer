@@ -1,0 +1,30 @@
+.booking-card{
+    background:white;
+    padding:20px;
+    margin:20px 0;
+    border-radius:12px;
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+    position: relative;
+}
+
+.booking-card h3{
+    color:#C89B3C;
+}
+
+.booking-card p{
+    margin:8px 0;
+}
+
+.clear-booking{
+    margin-top:15px;
+    background:#d9534f;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.clear-booking:hover{
+    background:#c9302c;
+}

@@ -18,6 +18,7 @@ const pFileList = document.getElementById("pFileList");
 const pProgressWrap = document.getElementById("pProgressWrap");
 const pProgressFill = document.getElementById("pProgressFill");
 const pProgressPct = document.getElementById("pProgressPct");
+const pProgressStatus = document.getElementById("pProgressStatus");
 const pSubmitBtn = document.getElementById("pSubmitBtn");
 const pMessage = document.getElementById("pMessage");
 const projectFilesGrid = document.getElementById("projectFilesGrid");
@@ -175,8 +176,10 @@ function openProjectFilesModal(projectId) {
     pMessage.textContent = "";
     pMessage.className = "form-msg";
     pProgressWrap.hidden = true;
+    pProgressWrap.classList.remove("hiding", "processing", "complete");
     pProgressFill.style.width = "0%";
     pProgressPct.textContent = "0%";
+    pProgressStatus.textContent = "";
     filesModal.classList.remove("hidden");
     loadProjectPhotos(projectId);
 }
@@ -305,10 +308,48 @@ function setPMessage(text, type) {
     pMessage.className = "form-msg" + (type ? " " + type : "");
 }
 
-function setPProgress(pct) {
+function showPProgress() {
     pProgressWrap.hidden = false;
+    pProgressWrap.classList.remove("hiding", "processing", "complete");
+    pProgressFill.style.width = "0%";
+    pProgressPct.textContent = "0%";
+    pProgressStatus.textContent = "Uploading…";
+}
+
+function setPUploadProgress(pct) {
+    // Reserve the last 10% for server-side saving so the bar stays honest.
+    pct = Math.max(0, Math.min(90, pct * 0.9));
+    pProgressWrap.classList.remove("processing", "complete");
     pProgressFill.style.width = pct + "%";
     pProgressPct.textContent = Math.round(pct) + "%";
+    pProgressStatus.textContent = "Uploading…";
+}
+
+function startPProcessing() {
+    pProgressWrap.classList.add("processing");
+    pProgressWrap.classList.remove("complete");
+    pProgressFill.style.width = "100%";
+    pProgressPct.textContent = "100%";
+    pProgressStatus.textContent = "Saving…";
+}
+
+function finishPProgress() {
+    pProgressWrap.classList.remove("processing");
+    pProgressWrap.classList.add("complete");
+    pProgressFill.style.width = "100%";
+    pProgressPct.textContent = "✓";
+    pProgressStatus.textContent = "Done";
+}
+
+function hidePProgress() {
+    pProgressWrap.classList.add("hiding");
+    setTimeout(() => {
+        pProgressWrap.hidden = true;
+        pProgressWrap.classList.remove("hiding", "processing", "complete");
+        pProgressFill.style.width = "0%";
+        pProgressPct.textContent = "0%";
+        pProgressStatus.textContent = "";
+    }, 450);
 }
 
 pUploadFiles.addEventListener("change", renderPUploadFiles);
@@ -336,8 +377,11 @@ projectUploadForm.addEventListener("submit", (e) => {
     if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
     xhr.upload.addEventListener("progress", (ev) => {
-        if (ev.lengthComputable) setPProgress((ev.loaded / ev.total) * 100);
+        if (ev.lengthComputable) setPUploadProgress((ev.loaded / ev.total) * 100);
     });
+
+    // Network transfer finished; server is still saving the file(s).
+    xhr.upload.addEventListener("load", () => startPProcessing());
 
     xhr.addEventListener("load", () => {
         pSubmitBtn.disabled = false;
@@ -352,15 +396,15 @@ projectUploadForm.addEventListener("submit", (e) => {
         }
 
         if (xhr.status >= 200 && xhr.status < 300 && data.success) {
+            finishPProgress();
             window.showToast(`${data.message}`, "success");
             projectUploadForm.reset();
             pFileList.innerHTML = "";
-            pProgressWrap.hidden = true;
-            pProgressFill.style.width = "0%";
-            pProgressPct.textContent = "0%";
             loadProjectPhotos(currentProjectId);
             loadProjects();
+            setTimeout(hidePProgress, 900);
         } else {
+            hidePProgress();
             setPMessage(data.message || "Upload failed. Please try again.", "error");
         }
     });
@@ -368,12 +412,13 @@ projectUploadForm.addEventListener("submit", (e) => {
     xhr.addEventListener("error", () => {
         pSubmitBtn.disabled = false;
         pSubmitBtn.textContent = "Upload to Project";
+        hidePProgress();
         setPMessage("Network error. Is the server running?", "error");
     });
 
     pSubmitBtn.disabled = true;
     pSubmitBtn.textContent = "Uploading...";
-    setPProgress(0);
+    showPProgress();
     xhr.send(formData);
 });
 
