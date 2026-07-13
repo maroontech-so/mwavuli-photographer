@@ -9,6 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <link rel="stylesheet" href="style.css">
+    <!-- Instant first-impression hero: preload the LCP image so it paints
+         before any JS runs, instead of waiting on the /api/hero fetch. -->
+    <link rel="preload" as="image" href="assets/images/hero/hero.webp" fetchpriority="high">
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -61,6 +65,7 @@
     </div>
 
     <section id="home" class="hero">
+        <div class="hero-bg" aria-hidden="true"></div>
         <div class="hero-slides" id="heroSlides" aria-hidden="true"></div>
 
         <div class="overlay">
