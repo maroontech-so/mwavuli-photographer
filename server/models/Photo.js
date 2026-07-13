@@ -23,6 +23,11 @@ const photoSchema = new mongoose.Schema({
         required:true
     },
 
+    thumbnail:{
+        type:String,
+        default:""
+    },
+
     project:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Project",

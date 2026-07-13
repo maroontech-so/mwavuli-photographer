@@ -1,9 +1,12 @@
 const Photo = require("../models/Photo");
 const Project = require("../models/Project");
 const path = require("path");
+const fs = require("fs");
+const { sanitizeMedia, UPLOAD_DIR } = require("../utils/sanitize");
 
 // Upload one or more media files
 exports.uploadPhoto = async (req, res) => {
+    const produced = [];
     try {
         const { title, category, project } = req.body;
         const files = req.files;
@@ -33,24 +36,33 @@ exports.uploadPhoto = async (req, res) => {
             ? title.trim()
             : null;
 
-        const docs = files.map((file, i) => {
-            const mediaType = file.mimetype.startsWith("video")
-                ? "video"
-                : "photo";
+        const docs = [];
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            // Sanitise every upload: validates the real file type, strips
+            // metadata, resizes/transcodes and produces a thumbnail.
+            const result = await sanitizeMedia(file.path, file.originalname);
+            produced.push(path.join(UPLOAD_DIR, result.file));
+            if (result.thumbnail) {
+                produced.push(path.join(UPLOAD_DIR, result.thumbnail));
+            }
 
             const nameFromFile = path.parse(file.originalname).name;
             const itemTitle = baseTitle
                 ? (files.length > 1 ? `${baseTitle} (${i + 1})` : baseTitle)
                 : nameFromFile;
 
-            return {
+            docs.push({
                 title: itemTitle,
                 category,
-                file: file.filename,
-                mediaType,
+                file: result.file,
+                thumbnail: result.thumbnail || "",
+                mediaType: result.mediaType,
                 project: project || null
-            };
-        });
+            });
+        }
 
         const photos = await Photo.insertMany(docs);
 
@@ -61,9 +73,14 @@ exports.uploadPhoto = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
+        // Roll back any media already written for this request.
+        await Promise.all(
+            produced.map(p => fs.promises.unlink(p).catch(() => {}))
+        );
+        const status = error.status || 500;
+        res.status(status).json({
             success: false,
-            message: error.message
+            message: error.message || "Upload failed"
         });
     }
 };

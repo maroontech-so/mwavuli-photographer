@@ -26,10 +26,12 @@ const fileFilter = (req,file,cb)=>{
         "image/jpeg",
         "image/png",
         "image/jpg",
+        "image/webp",
 
         "video/mp4",
         "video/quicktime",
-        "video/x-msvideo"
+        "video/x-msvideo",
+        "video/webm"
 
     ];
 
