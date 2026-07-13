@@ -111,65 +111,60 @@ async function sanitizeImage(buf, originalPath, base) {
 async function sanitizeVideo(originalPath, base) {
     const available = await ffmpegAvailable();
 
-    if (!available) {
-        // No transcoder: accept the file (validated by magic bytes) but it
-        // cannot be normalised or thumbnailed in this environment.
-        return {
-            file: path.basename(originalPath),
-            thumbnail: null,
-            mediaType: "video"
-        };
-    }
-
+    // The final file MUST live inside UPLOAD_DIR so the controller's
+    // path.join(UPLOAD_DIR, result.file) always resolves — multer may drop the
+    // raw upload elsewhere (e.g. a cwd-relative uploads/ folder on Render).
     const fullName = outName(base, ".mp4", originalPath);
     const fullPath = path.join(UPLOAD_DIR, fullName);
-    const tmpPath = fullPath + ".tmp.mp4";
-    const thumbName = base + "-thumb.jpg";
-    const thumbPath = path.join(UPLOAD_DIR, thumbName);
+    const sameFile = path.resolve(originalPath) === path.resolve(fullPath);
 
-    // Poster frame for the gallery grid (never enlarged).
-    await execFileP("ffmpeg", [
-        "-y", "-i", originalPath,
-        "-vf", "scale='min(800,iw)':-2",
-        "-frames:v", "1",
-        thumbPath
-    ]).catch(() => {});
-
-    const { videoCodec, hasAudio, audioCodec } = await probeVideo(originalPath).catch(() => ({
-        videoCodec: null, hasAudio: false, audioCodec: null
-    }));
-
-    const alreadySafe = videoCodec === "h264" && (!hasAudio || audioCodec === "aac");
-
-    const args = ["-y", "-i", originalPath];
-    if (alreadySafe) {
-        args.push("-c", "copy", "-movflags", "+faststart");
-    } else {
-        args.push(
-            "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-            "-pix_fmt", "yuv420p", "-movflags", "+faststart"
-        );
-        if (hasAudio) {
-            args.push("-c:a", "aac", "-b:a", "128k");
-        } else {
-            args.push("-an");
+    if (!sameFile) {
+        await fsp.copyFile(originalPath, fullPath).catch(() => {});
+        // Only discard the raw upload once we actually have a copy.
+        if (fs.existsSync(fullPath)) {
+            await fsp.unlink(originalPath).catch(() => {});
         }
     }
-    // ffmpeg cannot write in-place; encode to a temp file then replace.
-    args.push(tmpPath);
 
-    try {
-        await execFileP("ffmpeg", args);
-        await fsp.rename(tmpPath, fullPath);
-    } finally {
-        await fsp.unlink(tmpPath).catch(() => {});
+    let thumbName = null;
+
+    if (available) {
+        const thumbTmp = path.join(UPLOAD_DIR, base + "-thumb.jpg");
+        // Poster frame only (cheap, single frame) for the gallery grid.
+        await execFileP("ffmpeg", [
+            "-y", "-i", fullPath,
+            "-vf", "scale='min(800,iw)':-2",
+            "-frames:v", "1",
+            thumbTmp
+        ]).catch(() => {});
+        if (fs.existsSync(thumbTmp)) thumbName = base + "-thumb.jpg";
+
+        // Cheap normalisation for already web-ready clips (faststart + copy).
+        // Heavy transcodes are skipped on the server to avoid OOM/timeouts on
+        // memory-limited hosts (e.g. Render free tier) — Cloudinary streams
+        // and transforms the original instead.
+        const { videoCodec, hasAudio, audioCodec } = await probeVideo(fullPath)
+            .catch(() => ({ videoCodec: null, hasAudio: false, audioCodec: null }));
+
+        const alreadySafe = videoCodec === "h264" && (!hasAudio || audioCodec === "aac");
+        if (alreadySafe) {
+            const tmpPath = fullPath + ".tmp.mp4";
+            try {
+                await execFileP("ffmpeg", [
+                    "-y", "-i", fullPath,
+                    "-c", "copy", "-movflags", "+faststart",
+                    tmpPath
+                ]);
+                await fsp.rename(tmpPath, fullPath);
+            } catch {
+                await fsp.unlink(tmpPath).catch(() => {});
+            }
+        }
     }
 
-    await fsp.unlink(originalPath).catch(() => {});
-
     return {
-        file: fullName,
-        thumbnail: fs.existsSync(thumbPath) ? thumbName : null,
+        file: path.basename(fullPath),
+        thumbnail: thumbName,
         mediaType: "video"
     };
 }
