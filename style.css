@@ -1549,7 +1549,7 @@ nav ul li a:hover {
     .project-page .gallery,
     .projects-grid {
         padding-left: 0;
-        padding-right: 0
+        padding-right: 0;
     }
 
     nav ul li {
@@ -2025,7 +2025,7 @@ section p {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 2px;
-    padding: 0 8%
+    padding: 0 0%;
 }
 
 .project-admin-grid {
@@ -2108,7 +2108,7 @@ section p {
 
 .gallery-section {
     margin-bottom: 30px;
-    padding: 0 2%
+    padding: 0 1%
 }
 
 .gallery-section-title {
