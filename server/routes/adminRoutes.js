@@ -10,4 +10,7 @@ router.post("/login", adminController.login);
 // Protected: only authenticated admins can register new admins
 router.post("/register", auth, adminController.register);
 
+// Protected: change the signed-in admin's password
+router.patch("/password", auth, adminController.changePassword);
+
 module.exports = router;

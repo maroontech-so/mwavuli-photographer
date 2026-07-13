@@ -102,3 +102,53 @@ exports.login = async (req, res) => {
         });
     }
 };
+
+// Change the signed-in admin's own password (protected route)
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Both current and new password are required."
+            });
+        }
+
+        if (typeof newPassword !== "string" || newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: "New password must be at least 6 characters."
+            });
+        }
+
+        const admin = await Admin.findById(req.admin.id);
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: "Admin account not found."
+            });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, admin.password);
+        if (!isMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "Current password is incorrect."
+            });
+        }
+
+        admin.password = await bcrypt.hash(newPassword, 10);
+        await admin.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Password changed successfully."
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};

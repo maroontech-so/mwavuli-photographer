@@ -365,6 +365,7 @@ body{
 
 .panel-form input[type="text"],
 .panel-form input[type="email"],
+.panel-form input[type="password"],
 .panel-form input[type="file"],
 .panel-form select,
 .panel-form textarea{
@@ -391,6 +392,17 @@ body{
 .panel-form input[type="file"]{
     padding:11px 14px;
     cursor:pointer;
+}
+
+.settings-section{
+    margin-top:38px;
+}
+
+.settings-section h2{
+    font-family:var(--font-display, "Cinzel", serif);
+    font-size:20px;
+    color:var(--ink);
+    margin:0 0 16px;
 }
 
 .panel-form button[type="submit"]{

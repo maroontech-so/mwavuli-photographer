@@ -224,11 +224,32 @@
                 <p class="empty-state">No bookings yet.</p>
             </div>
         </div>
+
+        <div class="settings-section">
+            <h2>Account Settings</h2>
+            <form id="changePasswordForm" class="panel-form" novalidate>
+                <label for="currentPassword">Current Password</label>
+                <input type="password" id="currentPassword" autocomplete="current-password" required>
+
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" autocomplete="new-password" minlength="6" required>
+
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" autocomplete="new-password" minlength="6" required>
+
+                <button type="submit" id="changePasswordBtn">Update Password</button>
+                <p id="passwordMsg" class="form-msg"></p>
+            </form>
+        </div>
+
+    </div>
+        </div>
     </div>
 
     <script src="auth.js?v=3"></script>
     <script src="admin-ui.js?v=3"></script>
     <script src="dashboard.js?v=3"></script>
+    <script src="settings.js?v=3"></script>
 
 
     <script>
