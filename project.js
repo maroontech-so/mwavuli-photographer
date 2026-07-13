@@ -6,6 +6,9 @@
                 ? 'http://localhost:5000'
                 : `${window.location.protocol}//${window.location.hostname}:5000`));
 
+    // Cloudinary URLs are stored as-is; legacy local filenames resolve to /uploads.
+    const mediaUrl = (f) => (f && /^https?:\/\//.test(f)) ? f : (API + "/uploads/" + f);
+
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get("id");
 
@@ -48,13 +51,13 @@
                 div.className = "gallery-item";
                 const thumb = photo.thumbnail || photo.file;
                 const media = photo.mediaType === "video"
-                    ? `<video controls preload="none" poster="${API}/uploads/${thumb}" draggable="false"><source src="${API}/uploads/${photo.file}" type="video/mp4"></video>`
-                    : `<img src="${API}/uploads/${thumb}" alt="${photo.title}" data-full="${API}/uploads/${photo.file}" loading="lazy" decoding="async" draggable="false">`;
+                    ? `<video controls preload="none" poster="${mediaUrl(thumb)}" draggable="false"><source src="${mediaUrl(photo.file)}" type="video/mp4"></video>`
+                    : `<img src="${mediaUrl(thumb)}" alt="${photo.title}" data-full="${mediaUrl(photo.file)}" loading="lazy" decoding="async" draggable="false">`;
                 div.innerHTML = media;
                 gallery.appendChild(div);
 
                 if (photo.mediaType === "photo") {
-                    imageSources.push(`${API}/uploads/${photo.file}`);
+                    imageSources.push(`${mediaUrl(photo.file)}`);
                 }
             });
 

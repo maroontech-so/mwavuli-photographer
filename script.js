@@ -8,6 +8,8 @@
         }
         return origin; // deployed: same-origin serverless API
     })();
+    // Cloudinary URLs are stored as-is; legacy local filenames resolve to /uploads.
+    const mediaUrl = (f) => (f && /^https?:\/\//.test(f)) ? f : (API + "/uploads/" + f);
     console.debug('[booking] API base =', JSON.stringify(API));
 
     // Self-contained toast (public site has no admin bundle).
@@ -155,7 +157,7 @@
                 <a class="featured-card" href="gallery.html">
                     <div class="project-cover">
                         ${project.cover
-                            ? `<img src="${API}/uploads/${project.cover}" alt="${escapeHtml(project.title)}">`
+                            ? `<img src="${mediaUrl(project.cover)}" alt="${escapeHtml(project.title)}">`
                             : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`}
                         <div class="project-overlay">
                             <h3>${escapeHtml(project.title)}</h3>
@@ -425,4 +427,124 @@
             }
         });
     }
+
+    // ---- Hero slideshow (dynamic, swipe-able) ----
+    function initHeroSlideshow() {
+        const container = document.getElementById("heroSlides");
+        if (!container) return;
+
+        let slides = [];
+        let index = 0;
+        let timer = null;
+        let dragging = false;
+        let startX = 0;
+        let deltaX = 0;
+        let autoplay = true;
+        let interval = 5000;
+        let track = null;
+
+        function setTransform(px) {
+            if (!track) return;
+            track.style.transform = `translateX(${px}px)`;
+        }
+
+        function go(i) {
+            if (!slides.length) return;
+            index = (i + slides.length) % slides.length;
+            if (track) {
+                track.style.transition = "transform 0.8s cubic-bezier(.22,.61,.36,1)";
+                setTransform(-index * container.clientWidth);
+            }
+        }
+
+        function startAuto() {
+            stopAuto();
+            if (autoplay && slides.length > 1) {
+                timer = setInterval(() => go(index + 1), interval);
+            }
+        }
+
+        function stopAuto() {
+            if (timer) clearInterval(timer);
+            timer = null;
+        }
+
+        function buildTrack() {
+            container.innerHTML = `<div class="hero-track" id="heroTrack">` +
+                slides.map(s =>
+                    `<div class="hero-slide" style="background-image:url('${mediaUrl(s.image)}')"></div>`
+                ).join("") +
+                `</div>`;
+            track = document.getElementById("heroTrack");
+
+            track.addEventListener("touchstart", (e) => {
+                dragging = true;
+                startX = e.touches[0].clientX;
+                deltaX = 0;
+                stopAuto();
+                track.style.transition = "none";
+            }, { passive: true });
+
+            track.addEventListener("touchmove", (e) => {
+                if (!dragging) return;
+                deltaX = e.touches[0].clientX - startX;
+                setTransform(-index * container.clientWidth + deltaX);
+            }, { passive: true });
+
+            track.addEventListener("touchend", () => {
+                if (!dragging) return;
+                dragging = false;
+                if (Math.abs(deltaX) > 50) go(index + (deltaX < 0 ? 1 : -1));
+                else go(index);
+                startAuto();
+            });
+
+            track.addEventListener("mousedown", (e) => {
+                dragging = true;
+                startX = e.clientX;
+                deltaX = 0;
+                stopAuto();
+                track.style.transition = "none";
+            });
+
+            window.addEventListener("mousemove", (e) => {
+                if (!dragging) return;
+                deltaX = e.clientX - startX;
+                setTransform(-index * container.clientWidth + deltaX);
+            });
+
+            window.addEventListener("mouseup", () => {
+                if (!dragging) return;
+                dragging = false;
+                if (Math.abs(deltaX) > 50) go(index + (deltaX < 0 ? 1 : -1));
+                else go(index);
+                startAuto();
+            });
+
+            window.addEventListener("resize", () => go(index));
+
+            go(0);
+            startAuto();
+        }
+
+        function showFallback() {
+            container.innerHTML = `<div class="hero-slide hero-slide-fallback"></div>`;
+        }
+
+        fetch(`${API}/api/hero`)
+            .then(r => r.json())
+            .then(data => {
+                if (!data || !data.success || !data.enabled || !data.slides || !data.slides.length) {
+                    showFallback();
+                    return;
+                }
+                slides = data.slides;
+                autoplay = data.autoplay;
+                interval = data.interval || 5000;
+                buildTrack();
+            })
+            .catch(() => showFallback());
+    }
+
+    initHeroSlideshow();
 })();

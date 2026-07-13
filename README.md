@@ -143,6 +143,12 @@ ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=your_admin_password
 NODE_ENV=development
 PORT=5000
+
+# Cloudinary (media storage) — required in production
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLOUDINARY_FOLDER=mwavuli
 ```
 
 ### Variable Descriptions
@@ -154,6 +160,10 @@ PORT=5000
 | `ADMIN_PASSWORD` | Default admin password seeded on startup | Yes |
 | `NODE_ENV` | Environment: `development` or `production` | No |
 | `PORT` | Server port, defaults to `5000` | No |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | Yes (prod) |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | Yes (prod) |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Yes (prod) |
+| `CLOUDINARY_FOLDER` | Folder in your Cloudinary account for uploads | No |
 
 ## Local Development
 
@@ -298,7 +308,18 @@ The admin panel is located at `/admin/` and uses JWT-based authentication.
    - `JWT_SECRET`
    - `ADMIN_EMAIL`
    - `ADMIN_PASSWORD`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+   - `CLOUDINARY_FOLDER` (optional, defaults to `mwavuli`)
 6. Deploy
+
+> **Why Cloudinary is required:** Render's free web service has an ephemeral
+> filesystem. Any file written to `server/uploads/` (old behaviour) is deleted
+> whenever the service spins down after inactivity, so uploaded photos would
+> vanish after ~15–30 minutes. Media is now uploaded to Cloudinary and served
+> from its CDN, which survives restarts. The frontend falls back to the local
+> `/uploads/` route automatically for any legacy entries.
 
 ### Vercel
 - A `vercel.json` file is included for Vercel deployment

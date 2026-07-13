@@ -6,6 +6,9 @@
                 ? 'http://localhost:5000'
                 : `${window.location.protocol}//${window.location.hostname}:5000`));
 
+    // Cloudinary URLs are stored as-is; legacy local filenames resolve to /uploads.
+    const mediaUrl = (f) => (f && /^https?:\/\//.test(f)) ? f : (API + "/uploads/" + f);
+
     const container = document.getElementById("projectsContainer");
 
     async function loadProjects() {
@@ -28,7 +31,7 @@
                 card.innerHTML = `
                     <div class="project-cover">
                         ${p.cover
-                            ? `<img src="${API}/uploads/${p.cover}" alt="${p.title}">`
+                            ? `<img src="${mediaUrl(p.cover)}" alt="${p.title}">`
                             : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`}
                         <div class="project-overlay">
                             <h3>${p.title}</h3>

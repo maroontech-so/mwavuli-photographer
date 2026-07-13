@@ -6,6 +6,7 @@ console.log("MONGO_URI =", process.env.MONGO_URI ? "Set" : "Not set");
 
 const connectDB = require("./config/db");
 const adminRoutes = require("./routes/adminRoutes");
+const heroRoutes = require("./routes/heroRoutes");
 const photoRoutes = require("./routes/photoRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const testimonialRoutes = require("./routes/testimonialRoutes");
@@ -44,6 +45,7 @@ const uploadsPath = path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsPath));
 
 app.use("/api/admin", adminRoutes);
+app.use("/api/hero", heroRoutes);
 app.use("/api/photos", photoRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/messages", require("./routes/messageRoutes"));

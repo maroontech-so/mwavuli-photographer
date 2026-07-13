@@ -3,10 +3,12 @@ const Project = require("../models/Project");
 const path = require("path");
 const fs = require("fs");
 const { sanitizeMedia, UPLOAD_DIR } = require("../utils/sanitize");
+const { uploadToCloudinary, deleteFromCloudinary } = require("../utils/cloudStorage");
 
 // Upload one or more media files
 exports.uploadPhoto = async (req, res) => {
-    const produced = [];
+    const localFiles = [];   // sanitised files on disk, deleted after upload
+    const cloudFiles = [];   // { url, type } stored in Cloudinary, rolled back on error
     try {
         const { title, category, project } = req.body;
         const files = req.files;
@@ -44,9 +46,24 @@ exports.uploadPhoto = async (req, res) => {
             // Sanitise every upload: validates the real file type, strips
             // metadata, resizes/transcodes and produces a thumbnail.
             const result = await sanitizeMedia(file.path, file.originalname);
-            produced.push(path.join(UPLOAD_DIR, result.file));
-            if (result.thumbnail) {
-                produced.push(path.join(UPLOAD_DIR, result.thumbnail));
+
+            const fullLocal = path.join(UPLOAD_DIR, result.file);
+            const thumbLocal = result.thumbnail
+                ? path.join(UPLOAD_DIR, result.thumbnail)
+                : null;
+            localFiles.push(fullLocal);
+            if (thumbLocal) localFiles.push(thumbLocal);
+
+            // Push the sanitised files to Cloudinary (survives Render restarts)
+            // and keep the returned CDN URLs on the photo document.
+            const fullType = result.mediaType === "video" ? "video" : "image";
+            const fullUrl = await uploadToCloudinary(fullLocal, { resourceType: fullType });
+            cloudFiles.push({ url: fullUrl, type: fullType });
+
+            let thumbUrl = "";
+            if (thumbLocal) {
+                thumbUrl = await uploadToCloudinary(thumbLocal, { resourceType: "image" });
+                cloudFiles.push({ url: thumbUrl, type: "image" });
             }
 
             const nameFromFile = path.parse(file.originalname).name;
@@ -57,14 +74,17 @@ exports.uploadPhoto = async (req, res) => {
             docs.push({
                 title: itemTitle,
                 category,
-                file: result.file,
-                thumbnail: result.thumbnail || "",
+                file: fullUrl,
+                thumbnail: thumbUrl,
                 mediaType: result.mediaType,
                 project: project || null
             });
         }
 
         const photos = await Photo.insertMany(docs);
+
+        // Local temp files are no longer needed once stored in Cloudinary.
+        await Promise.all(localFiles.map(p => fs.promises.unlink(p).catch(() => {})));
 
         res.status(201).json({
             success: true,
@@ -73,10 +93,12 @@ exports.uploadPhoto = async (req, res) => {
         });
 
     } catch (error) {
-        // Roll back any media already written for this request.
+        // Roll back: remove anything already pushed to Cloudinary and any
+        // local temp files left behind for this request.
         await Promise.all(
-            produced.map(p => fs.promises.unlink(p).catch(() => {}))
+            cloudFiles.map(c => deleteFromCloudinary(c.url, { resourceType: c.type }).catch(() => {}))
         );
+        await Promise.all(localFiles.map(p => fs.promises.unlink(p).catch(() => {})));
         const status = error.status || 500;
         res.status(status).json({
             success: false,
@@ -139,6 +161,21 @@ exports.updatePhoto = async (req, res) => {
 // Delete Photo
 exports.deletePhoto = async (req, res) => {
     try {
+        const photo = await Photo.findById(req.params.id);
+        if (!photo) {
+            return res.status(404).json({
+                success: false,
+                message: "Photo not found"
+            });
+        }
+
+        // Remove the stored assets from Cloudinary too.
+        const fullType = photo.mediaType === "video" ? "video" : "image";
+        await deleteFromCloudinary(photo.file, { resourceType: fullType }).catch(() => {});
+        if (photo.thumbnail) {
+            await deleteFromCloudinary(photo.thumbnail, { resourceType: "image" }).catch(() => {});
+        }
+
         await Photo.findByIdAndDelete(req.params.id);
 
         res.status(200).json({

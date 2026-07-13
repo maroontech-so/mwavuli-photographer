@@ -1,5 +1,8 @@
 const { API, apiFetch } = window.adminAuth;
 
+// Cloudinary URLs are stored as-is; legacy local filenames resolve to /uploads.
+const mediaUrl = (f) => (f && /^https?:\/\//.test(f)) ? f : (API + "/uploads/" + f);
+
 const container = document.getElementById("projectContainer");
 const modal = document.getElementById("projectModal");
 const form = document.getElementById("projectForm");
@@ -106,7 +109,7 @@ function renderProjects() {
         thumb.className = "project-admin-thumb";
         if (p.cover) {
             const img = document.createElement("img");
-            img.src = `${API}/uploads/${p.cover}`;
+            img.src = `${mediaUrl(p.cover)}`;
             img.alt = p.title;
             thumb.appendChild(img);
         } else {
@@ -214,8 +217,8 @@ function renderProjectFiles(photos, project) {
         if (isCover) item.classList.add("is-cover");
 
         const media = photo.mediaType === "video"
-            ? `<video controls preload="none" poster="${API}/uploads/${photo.thumbnail || photo.file}" src="${API}/uploads/${photo.file}" type="video/mp4"></video>`
-            : `<img src="${API}/uploads/${photo.thumbnail || photo.file}" alt="${photo.title}" loading="lazy">`;
+            ? `<video controls preload="none" poster="${mediaUrl(photo.thumbnail || photo.file)}" src="${mediaUrl(photo.file)}" type="video/mp4"></video>`
+            : `<img src="${mediaUrl(photo.thumbnail || photo.file)}" alt="${photo.title}" loading="lazy">`;
 
         item.innerHTML = `
             <div class="project-file-media">${media}</div>

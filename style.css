@@ -288,6 +288,34 @@ nav ul li a:hover {
     }
 }
 
+/* Dynamic hero slideshow */
+.hero-slides {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden
+}
+
+.hero-track {
+    display: flex;
+    height: 100%;
+    width: 100%
+}
+
+.hero-slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.05);
+    animation: kenburns 20s ease-in-out infinite alternate
+}
+
+.hero-slide-fallback {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    animation: none
+}
+
 .overlay {
     position: relative;
     z-index: 1;

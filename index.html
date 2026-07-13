@@ -32,7 +32,6 @@
 
             <ul id="navMenu">
                 <li><a href="#about">About</a></li>
-                <li><a href="gallery.html">Portfolio</a></li>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#services">Services</a></li>
                 <li><a href="#testimonials">Testimonials</a></li>
@@ -62,7 +61,7 @@
     </div>
 
     <section id="home" class="hero">
-        <div class="hero-bg"></div>
+        <div class="hero-slides" id="heroSlides" aria-hidden="true"></div>
 
         <div class="overlay">
 
@@ -77,9 +76,7 @@
                     <a href="gallery.html" class="btn">View Portfolio</a>
 
                     <a href="https://wa.me/254769578232" class="btn2" target="_blank">
-
                         Book a Session
-
                     </a>
                 </div>
 
@@ -100,7 +97,8 @@
 
                 <picture>
                     <source srcset="assets/images/portraits/portrait1.webp" type="image/webp">
-                    <img src="assets/images/portraits/portrait1.jpg" alt="Photographer" loading="lazy" decoding="async" width="450" height="506">
+                    <img src="assets/images/portraits/portrait1.jpg" alt="Photographer" loading="lazy" decoding="async"
+                        width="450" height="506">
                 </picture>
 
             </div>
@@ -142,27 +140,27 @@
         </div>
 
     </section>
+    <div id="projects">
+        <section id="portfolio" class="portfolio teaser">
 
-    <section id="portfolio" class="portfolio teaser">
+            <span class="section-eyebrow">Featured Work</span>
+            <h2>Projects</h2>
+            <p>Browse our latest projects. Select any cover to view the full collection.</p>
 
-        <span class="section-eyebrow">Featured Work</span>
-        <h2>Projects</h2>
-        <p>Browse our latest projects. Select any cover to view the full collection.</p>
+            <div class="carousel-wrap">
+                <button class="carousel-btn prev" id="carouselPrev" aria-label="Previous"><i
+                        class="fa-solid fa-chevron-left"></i></button>
+                <div class="carousel-track" id="featuredCarousel"></div>
+                <button class="carousel-btn next" id="carouselNext" aria-label="Next"><i
+                        class="fa-solid fa-chevron-right"></i></button>
+            </div>
 
-        <div class="carousel-wrap">
-            <button class="carousel-btn prev" id="carouselPrev" aria-label="Previous"><i
-                    class="fa-solid fa-chevron-left"></i></button>
-            <div class="carousel-track" id="featuredCarousel"></div>
-            <button class="carousel-btn next" id="carouselNext" aria-label="Next"><i
-                    class="fa-solid fa-chevron-right"></i></button>
-        </div>
+            <div class="teaser-cta">
+                <a href="gallery.html" class="btn">See More</a>
+            </div>
 
-        <div class="teaser-cta">
-            <a href="gallery.html" class="btn">See More</a>
-        </div>
-
-    </section>
-
+        </section>
+    </div>
     <section id="services" class="services">
 
         <h2>My Services</h2>
@@ -210,7 +208,7 @@
         </div>
 
     </section>
-
+    <!--
     <section id="projects" class="projects">
 
         <h2>All Projects</h2>
@@ -228,7 +226,7 @@
         </div>
 
     </section>
-
+-->
     <section id="testimonials" class="testimonials">
 
         <h2>What My Clients Say</h2>
@@ -454,8 +452,8 @@
         <p>&copy; 2026 MWAVULI PHOTOGRAPHY. All Rights Reserved.</p>
 
     </footer>
-    <script src="script.js"></script>
-    <script src="gallery.js"></script>
+    <script src="script.js?v=2"></script>
+    <script src="gallery.js?v=2"></script>
     <script>
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("sw.js").catch(() => { });

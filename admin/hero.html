@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Media</title>
+    <title>Hero Management</title>
 
     <link rel="preload" as="style" href="../assets/fonts/fonts.css" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="../assets/fonts/fonts.css"></noscript>
     <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="hero.css">
 </head>
 
 <body>
@@ -29,14 +30,13 @@
                         <rect x="3" y="14" width="7" height="7" />
                     </svg>
                     Dashboard</a></li>
-            <li><a href="upload.html" class="active">
+            <li><a href="hero.html" class="active">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="17 8 12 3 7 8" />
-                        <line x1="12" y1="3" x2="12" y2="15" />
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="M3 9h18M9 21V9" />
                     </svg>
-                    Upload Media</a></li>
+                    Hero</a></li>
             <li><a href="gallery.html">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -53,6 +53,15 @@
                         <polyline points="21 15 16 10 5 21" />
                     </svg>
                     Projects</a></li>
+            <li><a href="bookings.html">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                    Bookings</a></li>
             <li><a href="messages.html">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -92,44 +101,63 @@
 
         <div class="page-header">
             <div>
-                <h1>Upload Media</h1>
-                <p>Add photos or videos to your general gallery.</p>
+                <h1>Hero Management</h1>
+                <p>Upload and arrange the images shown in the homepage hero slideshow.</p>
             </div>
         </div>
 
-        <form id="uploadForm" class="panel-form" enctype="multipart/form-data">
+        <div class="hero-settings card">
+            <h2>Slideshow Settings</h2>
+            <label class="switch-row">
+                <span>Slideshow enabled</span>
+                <input type="checkbox" id="heroEnabled">
+            </label>
+            <label class="switch-row">
+                <span>Autoplay</span>
+                <input type="checkbox" id="heroAutoplay">
+            </label>
+            <label class="switch-row">
+                <span>Interval (ms)</span>
+                <input type="number" id="heroInterval" min="1500" step="500" value="5000">
+            </label>
+            <button type="button" id="saveSettingsBtn" class="action-btn">Save Settings</button>
+            <p id="settingsMsg" class="form-msg"></p>
+        </div>
 
-            <label for="images">Media Files <span class="hint">(images or videos, multiple allowed)</span></label>
-            <input type="file" id="images" accept="image/*,video/*" multiple required>
-
-            <div id="fileList" class="file-list"></div>
-
-            <div class="progress-wrap" id="progressWrap" hidden>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+        <div class="card">
+            <h2>Add Image</h2>
+            <form id="heroUploadForm" class="panel-form" enctype="multipart/form-data">
+                <label for="heroFile">Hero image</label>
+                <input type="file" id="heroFile" accept="image/*" required>
+                <button type="submit" id="heroSubmitBtn">Upload Image</button>
+                <div class="progress-wrap" id="heroProgressWrap" hidden>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="heroProgressFill"></div>
+                    </div>
+                    <span class="progress-pct" id="heroProgressPct">0%</span>
                 </div>
-                <span class="progress-pct" id="progressPct">0%</span>
-            </div>
+                <p id="heroMsg" class="form-msg"></p>
+            </form>
+        </div>
 
-            <button type="submit" id="submitBtn">Upload Media</button>
-
-            <p id="message" class="form-msg"></p>
-
-        </form>
+        <div class="card">
+            <h2>Current Slides</h2>
+            <div id="heroSlidesGrid" class="hero-slides-grid"></div>
+            <p id="heroEmpty" class="empty-state" hidden>No slides yet. Add an image above.</p>
+        </div>
 
     </div>
 
     <script src="auth.js?v=4"></script>
     <script src="admin-ui.js?v=4"></script>
     <script src="bulk-actions.js?v=4"></script>
-    <script src="upload.js?v=4"></script>
-
-
+    <script src="hero.js?v=1"></script>
     <script>
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("/sw.js").catch(() => { });
         }
     </script>
+
 </body>
 
 </html>
