@@ -9,7 +9,7 @@ const heroUpload = require("../middleware/heroUpload");
 router.get("/", heroController.getHero);
 
 // Admin (protected)
-router.post("/slide", auth, heroUpload.single("image"), heroController.addSlide);
+router.post("/slide", auth, heroUpload.array("image", 20), heroController.addSlide);
 router.put("/order", auth, heroController.reorderSlides);
 router.put("/", auth, heroController.updateHero);
 router.delete("/slide/:id", auth, heroController.deleteSlide);

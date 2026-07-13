@@ -3,16 +3,18 @@ const cloudinary = require("../config/cloudinary");
 const FOLDER = process.env.CLOUDINARY_FOLDER || "mwavuli";
 
 // Upload a local file to Cloudinary and return its secure (https) URL.
-// f_auto,q_auto tells Cloudinary to serve the smallest supported format
-// (webp/avif) at the best quality automatically -> much faster delivery.
+// Optimizations (auto format + auto quality) are applied as DELIVERY
+// transformations (inserted into the URL), because f_auto is not valid as an
+// upload/eager transformation and would make the request fail.
 async function uploadToCloudinary(localPath, { resourceType = "auto" } = {}) {
     const result = await cloudinary.uploader.upload(localPath, {
         folder: FOLDER,
         resource_type: resourceType,
-        overwrite: false,
-        transformation: "f_auto,q_auto"
+        overwrite: false
     });
-    return result.secure_url;
+    // Insert q_auto,f_auto right after /upload/ so Cloudinary serves the
+    // smallest supported format at the best quality automatically.
+    return result.secure_url.replace("/upload/", "/upload/q_auto,f_auto/");
 }
 
 // Cloudinary secure URLs look like:

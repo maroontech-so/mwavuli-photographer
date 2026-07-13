@@ -10,7 +10,7 @@
 }
 
 .hero-settings .switch-row span {
-    color: var(--text, #e5e7eb);
+    color: var(--ink, #1e293b);
     font-size: 0.95rem;
 }
 
@@ -18,13 +18,56 @@
     width: 110px;
     padding: 8px 10px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.04);
-    color: #fff;
+    border: 1px solid var(--line, #e2e8f0);
+    background: #f8fafc;
+    color: var(--ink, #1e293b);
 }
 
 .hero-settings #saveSettingsBtn {
     margin-top: 16px;
+}
+
+/* toggle switch for the settings rows */
+.hero-settings .switch {
+    position: relative;
+    width: 46px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.hero-settings .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.hero-settings .switch .slider {
+    position: absolute;
+    inset: 0;
+    background: #cbd5e1;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.hero-settings .switch .slider::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.hero-settings .switch input:checked + .slider {
+    background: var(--gold, #C89B3C);
+}
+
+.hero-settings .switch input:checked + .slider::before {
+    transform: translateX(20px);
 }
 
 .hero-slides-grid {
@@ -34,10 +77,10 @@
 }
 
 .hero-slide-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--line, #e2e8f0);
     border-radius: 12px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.03);
+    background: #f8fafc;
 }
 
 .hero-slide-item img {
@@ -60,13 +103,13 @@
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.85rem;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    background: #e2e8f0;
+    color: var(--ink, #1e293b);
     transition: background 0.2s ease;
 }
 
 .hero-slide-actions button:hover {
-    background: rgba(255, 255, 255, 0.16);
+    background: #cbd5e1;
 }
 
 .hero-slide-actions .up-btn,
@@ -76,15 +119,22 @@
 }
 
 .hero-slide-actions .del-btn {
-    background: rgba(239, 68, 68, 0.15);
-    color: #fecaca;
+    background: rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
 }
 
 .hero-slide-actions .del-btn:hover {
-    background: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.22);
 }
 
 .hero-slide-actions button:disabled {
     opacity: 0.35;
     cursor: not-allowed;
+}
+
+.card-hint {
+    margin: -4px 0 14px;
+    color: var(--muted, #94a3b8);
+    font-size: 0.85rem;
+    line-height: 1.4;
 }

@@ -8,6 +8,13 @@ const API = window.API_BASE
 // Cloudinary URLs are stored as-is; legacy local filenames resolve to /uploads.
 const mediaUrl = (f) => (f && /^https?:\/\//.test(f)) ? f : (API + "/uploads/" + f);
 
+// Rewrite a Cloudinary delivery URL to request a size-constrained,
+// auto-format/auto-quality derivative on the fly (no re-upload needed).
+function cldUrl(url, t) {
+    if (!url || !/^https?:\/\/res\.cloudinary\.com\//.test(url)) return url;
+    return url.replace(/\/upload\/[^/]+/, `/upload/${t}`);
+}
+
 const projectCollectionsEl = document.getElementById("projectCollections");
 const generalGallery = document.getElementById("generalGallery");
 
@@ -53,15 +60,16 @@ if (projectCollectionsEl || generalGallery) {
             return;
         }
 
-        projects.forEach(p => {
+            projects.forEach(p => {
             const card = document.createElement("a");
             card.href = `project.html?id=${p._id}`;
             card.className = "gallery-collection-card";
+            const cover = p.cover
+                ? `<img src="${cldUrl(mediaUrl(p.cover), "w_800,c_limit,q_auto,f_auto")}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">`
+                : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`;
             card.innerHTML = `
                 <div class="collection-cover">
-                    ${p.cover
-                            ? `<img src="${mediaUrl(p.cover)}" alt="${escapeHtml(p.title)}">`
-                        : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`}
+                    ${cover}
                     <div class="project-overlay">
                         <h3>${escapeHtml(p.title)}</h3>
                         <p>${escapeHtml(p.location || "")}</p>
@@ -85,15 +93,22 @@ if (projectCollectionsEl || generalGallery) {
 
         photos.forEach((photo, i) => {
             const span = mosaic[i % mosaic.length];
-            const thumb = photo.thumbnail || photo.file;
+            const thumbBase = mediaUrl(photo.thumbnail || photo.file);
+            const thumbUrl = cldUrl(thumbBase, "w_640,c_limit,q_auto,f_auto");
+            const fullUrl = cldUrl(mediaUrl(photo.file), "w_1600,c_limit,q_auto,f_auto");
+            const srcset =
+                `${cldUrl(thumbBase, "w_400,c_limit,q_auto,f_auto")} 400w, ` +
+                `${thumbUrl} 640w, ` +
+                `${cldUrl(thumbBase, "w_800,c_limit,q_auto,f_auto")} 800w`;
+
             const media = photo.mediaType === "video"
-                ? `<video controls preload="none" poster="${mediaUrl(thumb)}" draggable="false">
-                        <source src="${mediaUrl(photo.file)}" type="video/mp4">
+                ? `<video controls preload="none" poster="${thumbUrl}" draggable="false">
+                        <source src="${fullUrl}" type="video/mp4">
                    </video>`
-                : `<img src="${mediaUrl(thumb)}" alt="${photo.title}" data-full="${mediaUrl(photo.file)}" loading="lazy" decoding="async" draggable="false">`;
+                : `<img src="${thumbUrl}" srcset="${srcset}" sizes="(max-width:600px) 100vw, (max-width:1024px) 50vw, 33vw" alt="${photo.title}" data-full="${fullUrl}" loading="lazy" decoding="async" draggable="false">`;
 
             if (photo.mediaType === "photo") {
-                imageSources.push(`${mediaUrl(photo.file)}`);
+                imageSources.push(fullUrl);
             }
 
             generalGallery.innerHTML += `

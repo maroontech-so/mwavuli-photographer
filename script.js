@@ -10,6 +10,13 @@
     })();
     // Cloudinary URLs are stored as-is; legacy local filenames resolve to /uploads.
     const mediaUrl = (f) => (f && /^https?:\/\//.test(f)) ? f : (API + "/uploads/" + f);
+
+    // Rewrite a Cloudinary delivery URL to request a size-constrained,
+    // auto-format/auto-quality derivative on the fly (no re-upload needed).
+    function cldUrl(url, t) {
+        if (!url || !/^https?:\/\/res\.cloudinary\.com\//.test(url)) return url;
+        return url.replace(/\/upload\/[^/]+/, `/upload/${t}`);
+    }
     console.debug('[booking] API base =', JSON.stringify(API));
 
     // Self-contained toast (public site has no admin bundle).
@@ -448,9 +455,24 @@
             track.style.transform = `translateX(${px}px)`;
         }
 
+        function heroBg(s) {
+            return cldUrl(mediaUrl(s.image), "w_1280,c_limit,q_auto,f_auto");
+        }
+
+        // Ensure a slide has its (size-constrained) background applied before
+        // it is shown, so we never download a slide we don't need.
+        function ensureBg(i) {
+            const el = track && track.children[i];
+            if (el && el.dataset.bg) {
+                el.style.backgroundImage = `url('${el.dataset.bg}')`;
+                delete el.dataset.bg;
+            }
+        }
+
         function go(i) {
             if (!slides.length) return;
             index = (i + slides.length) % slides.length;
+            ensureBg(index);
             if (track) {
                 track.style.transition = "transform 0.8s cubic-bezier(.22,.61,.36,1)";
                 setTransform(-index * container.clientWidth);
@@ -470,12 +492,30 @@
         }
 
         function buildTrack() {
+            // Preload only the first (above-the-fold) slide for an instant LCP.
+            const preload = document.createElement("link");
+            preload.rel = "preload";
+            preload.as = "image";
+            preload.href = heroBg(slides[0]);
+            document.head.appendChild(preload);
+
             container.innerHTML = `<div class="hero-track" id="heroTrack">` +
-                slides.map(s =>
-                    `<div class="hero-slide" style="background-image:url('${mediaUrl(s.image)}')"></div>`
+                slides.map((s, i) =>
+                    i === 0
+                        ? `<div class="hero-slide" style="background-image:url('${heroBg(s)}')"></div>`
+                        : `<div class="hero-slide" data-bg="${heroBg(s)}"></div>`
                 ).join("") +
                 `</div>`;
             track = document.getElementById("heroTrack");
+
+            // Fill in the remaining slides only when the browser is idle, so a
+            // slow device isn't swamped downloading every hero image at once.
+            const fillRest = () => slides.forEach((s, i) => ensureBg(i));
+            if ("requestIdleCallback" in window) {
+                requestIdleCallback(fillRest, { timeout: 2500 });
+            } else {
+                window.addEventListener("load", fillRest, { once: true });
+            }
 
             track.addEventListener("touchstart", (e) => {
                 dragging = true;

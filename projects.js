@@ -9,6 +9,13 @@
     // Cloudinary URLs are stored as-is; legacy local filenames resolve to /uploads.
     const mediaUrl = (f) => (f && /^https?:\/\//.test(f)) ? f : (API + "/uploads/" + f);
 
+    // Rewrite a Cloudinary delivery URL to request a size-constrained,
+    // auto-format/auto-quality derivative on the fly (no re-upload needed).
+    function cldUrl(url, t) {
+        if (!url || !/^https?:\/\/res\.cloudinary\.com\//.test(url)) return url;
+        return url.replace(/\/upload\/[^/]+/, `/upload/${t}`);
+    }
+
     const container = document.getElementById("projectsContainer");
 
     async function loadProjects() {
@@ -31,7 +38,7 @@
                 card.innerHTML = `
                     <div class="project-cover">
                         ${p.cover
-                            ? `<img src="${mediaUrl(p.cover)}" alt="${p.title}">`
+                            ? `<img src="${cldUrl(mediaUrl(p.cover), "w_800,c_limit,q_auto,f_auto")}" alt="${p.title}" loading="lazy" decoding="async">`
                             : `<div class="project-placeholder"><i class="fa-solid fa-camera"></i></div>`}
                         <div class="project-overlay">
                             <h3>${p.title}</h3>

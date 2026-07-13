@@ -14,6 +14,7 @@ const heroInterval = document.getElementById("heroInterval");
 
 const form = document.getElementById("heroUploadForm");
 const fileInput = document.getElementById("heroFile");
+const heroFileList = document.getElementById("heroFileList");
 const submitBtn = document.getElementById("heroSubmitBtn");
 const progressWrap = document.getElementById("heroProgressWrap");
 const progressFill = document.getElementById("heroProgressFill");
@@ -104,17 +105,68 @@ async function loadHero() {
     }
 }
 
-// Upload a new slide
+// Selected-files preview
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+function renderHeroFileList() {
+    heroFileList.innerHTML = "";
+    [...fileInput.files].forEach((file, i) => {
+        const item = document.createElement("div");
+        item.className = "file-item";
+
+        const preview = document.createElement("img");
+        preview.className = "fi-preview";
+        preview.alt = file.name;
+        preview.src = URL.createObjectURL(file);
+        preview.onload = () => URL.revokeObjectURL(preview.src);
+
+        const name = document.createElement("span");
+        name.className = "fi-name";
+        name.textContent = file.name;
+
+        const size = document.createElement("span");
+        size.className = "fi-size";
+        size.textContent = formatSize(file.size);
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "fi-remove";
+        remove.dataset.i = i;
+        remove.setAttribute("aria-label", "Remove");
+        remove.textContent = "×";
+
+        item.append(preview, name, size, remove);
+        heroFileList.appendChild(item);
+    });
+    heroFileList.querySelectorAll(".fi-remove").forEach(btn => {
+        btn.addEventListener("click", () => removeHeroFile(Number(btn.dataset.i)));
+    });
+}
+
+function removeHeroFile(index) {
+    const dt = new DataTransfer();
+    [...fileInput.files].forEach((f, i) => { if (i !== index) dt.items.add(f); });
+    fileInput.files = dt.files;
+    renderHeroFileList();
+}
+
+fileInput.addEventListener("change", renderHeroFileList);
+
+// Upload one or more new slides
 form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     if (!fileInput.files.length) {
-        setMsg(heroMsg, "Please choose an image.", "error");
+        setMsg(heroMsg, "Please choose at least one image.", "error");
         return;
     }
 
     const formData = new FormData();
-    formData.append("image", fileInput.files[0]);
+    [...fileInput.files].forEach(f => formData.append("image", f));
 
     const token = window.adminAuth.getToken();
     const xhr = new XMLHttpRequest();
@@ -132,7 +184,7 @@ form.addEventListener("submit", (e) => {
 
     xhr.addEventListener("load", () => {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Upload Image";
+        submitBtn.textContent = "Upload Images";
         let data = {};
         try { data = JSON.parse(xhr.responseText); } catch (_) {}
 
@@ -142,8 +194,9 @@ form.addEventListener("submit", (e) => {
         }
 
         if (xhr.status >= 200 && xhr.status < 300 && data.success) {
-            window.showToast("Slide added", "success");
+            window.showToast(data.message || "Slides added", "success");
             form.reset();
+            heroFileList.innerHTML = "";
             progressWrap.hidden = true;
             progressFill.style.width = "0%";
             loadHero();
@@ -154,7 +207,7 @@ form.addEventListener("submit", (e) => {
 
     xhr.addEventListener("error", () => {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Upload Image";
+        submitBtn.textContent = "Upload Images";
         setMsg(heroMsg, "Network error. Is the server running?", "error");
     });
 

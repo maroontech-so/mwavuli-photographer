@@ -9,6 +9,13 @@
     // Cloudinary URLs are stored as-is; legacy local filenames resolve to /uploads.
     const mediaUrl = (f) => (f && /^https?:\/\//.test(f)) ? f : (API + "/uploads/" + f);
 
+    // Rewrite a Cloudinary delivery URL to request a size-constrained,
+    // auto-format/auto-quality derivative on the fly (no re-upload needed).
+    function cldUrl(url, t) {
+        if (!url || !/^https?:\/\/res\.cloudinary\.com\//.test(url)) return url;
+        return url.replace(/\/upload\/[^/]+/, `/upload/${t}`);
+    }
+
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get("id");
 
@@ -49,15 +56,17 @@
             photos.forEach(photo => {
                 const div = document.createElement("div");
                 div.className = "gallery-item";
-                const thumb = photo.thumbnail || photo.file;
+                const thumbBase = mediaUrl(photo.thumbnail || photo.file);
+                const thumbUrl = cldUrl(thumbBase, "w_640,c_limit,q_auto,f_auto");
+                const fullUrl = cldUrl(mediaUrl(photo.file), "w_1600,c_limit,q_auto,f_auto");
                 const media = photo.mediaType === "video"
-                    ? `<video controls preload="none" poster="${mediaUrl(thumb)}" draggable="false"><source src="${mediaUrl(photo.file)}" type="video/mp4"></video>`
-                    : `<img src="${mediaUrl(thumb)}" alt="${photo.title}" data-full="${mediaUrl(photo.file)}" loading="lazy" decoding="async" draggable="false">`;
+                    ? `<video controls preload="none" poster="${thumbUrl}" draggable="false"><source src="${fullUrl}" type="video/mp4"></video>`
+                    : `<img src="${thumbUrl}" alt="${photo.title}" data-full="${fullUrl}" loading="lazy" decoding="async" draggable="false">`;
                 div.innerHTML = media;
                 gallery.appendChild(div);
 
                 if (photo.mediaType === "photo") {
-                    imageSources.push(`${mediaUrl(photo.file)}`);
+                    imageSources.push(fullUrl);
                 }
             });
 

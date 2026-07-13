@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hero Management</title>
 
-    <link rel="preload" as="style" href="../assets/fonts/fonts.css" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="../assets/fonts/fonts.css"></noscript>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="hero.css">
 </head>
@@ -110,11 +111,17 @@
             <h2>Slideshow Settings</h2>
             <label class="switch-row">
                 <span>Slideshow enabled</span>
-                <input type="checkbox" id="heroEnabled">
+                <span class="switch">
+                    <input type="checkbox" id="heroEnabled">
+                    <span class="slider"></span>
+                </span>
             </label>
             <label class="switch-row">
                 <span>Autoplay</span>
-                <input type="checkbox" id="heroAutoplay">
+                <span class="switch">
+                    <input type="checkbox" id="heroAutoplay">
+                    <span class="slider"></span>
+                </span>
             </label>
             <label class="switch-row">
                 <span>Interval (ms)</span>
@@ -125,11 +132,13 @@
         </div>
 
         <div class="card">
-            <h2>Add Image</h2>
+            <h2>Add Images</h2>
+            <p class="card-hint">Select one or more images. They are added to the slideshow in the order chosen.</p>
             <form id="heroUploadForm" class="panel-form" enctype="multipart/form-data">
-                <label for="heroFile">Hero image</label>
-                <input type="file" id="heroFile" accept="image/*" required>
-                <button type="submit" id="heroSubmitBtn">Upload Image</button>
+                <label for="heroFile">Hero images</label>
+                <input type="file" id="heroFile" accept="image/*" multiple>
+                <div id="heroFileList" class="file-list"></div>
+                <button type="submit" id="heroSubmitBtn">Upload Images</button>
                 <div class="progress-wrap" id="heroProgressWrap" hidden>
                     <div class="progress-bar">
                         <div class="progress-fill" id="heroProgressFill"></div>

@@ -35,38 +35,53 @@ exports.getHero = async (req, res) => {
     }
 };
 
-// Admin: add a hero slide
+// Admin: add one or more hero slides
 exports.addSlide = async (req, res) => {
     const localFiles = [];
     const cloudFiles = [];
     try {
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: "Please select an image." });
-        }
-
-        const result = await sanitizeMedia(req.file.path, req.file.originalname);
-        const fullLocal = path.join(UPLOAD_DIR, result.file);
-        const thumbLocal = result.thumbnail ? path.join(UPLOAD_DIR, result.thumbnail) : null;
-        localFiles.push(fullLocal);
-        if (thumbLocal) localFiles.push(thumbLocal);
-
-        const fullType = result.mediaType === "video" ? "video" : "image";
-        const imageUrl = await uploadToCloudinary(fullLocal, { resourceType: fullType });
-        cloudFiles.push({ url: imageUrl, type: fullType });
-
-        let thumbUrl = "";
-        if (thumbLocal) {
-            thumbUrl = await uploadToCloudinary(thumbLocal, { resourceType: "image" });
-            cloudFiles.push({ url: thumbUrl, type: "image" });
+        if (!req.files || !req.files.length) {
+            return res.status(400).json({ success: false, message: "Please select at least one image." });
         }
 
         const hero = await getOrCreateHero();
-        hero.slides.push({ image: imageUrl, thumbnail: thumbUrl, order: hero.slides.length });
+        const newSlides = [];
+
+        for (const file of req.files) {
+            const result = await sanitizeMedia(file.path, file.originalname);
+            const fullLocal = path.join(UPLOAD_DIR, result.file);
+            const thumbLocal = result.thumbnail ? path.join(UPLOAD_DIR, result.thumbnail) : null;
+            localFiles.push(fullLocal);
+            if (thumbLocal) localFiles.push(thumbLocal);
+
+            const fullType = result.mediaType === "video" ? "video" : "image";
+            const imageUrl = await uploadToCloudinary(fullLocal, { resourceType: fullType });
+            cloudFiles.push({ url: imageUrl, type: fullType });
+
+            let thumbUrl = "";
+            if (thumbLocal) {
+                thumbUrl = await uploadToCloudinary(thumbLocal, { resourceType: "image" });
+                cloudFiles.push({ url: thumbUrl, type: "image" });
+            }
+
+            // Keep the incoming order: append after existing slides.
+            newSlides.push({
+                image: imageUrl,
+                thumbnail: thumbUrl,
+                order: hero.slides.length + newSlides.length
+            });
+        }
+
+        hero.slides.push(...newSlides);
         await hero.save();
 
         await Promise.all(localFiles.map(p => fs.promises.unlink(p).catch(() => {})));
 
-        res.status(201).json({ success: true, message: "Slide added", ...publicView(hero) });
+        res.status(201).json({
+            success: true,
+            message: `${newSlides.length} slide(s) added`,
+            ...publicView(hero)
+        });
     } catch (error) {
         await Promise.all(cloudFiles.map(c => deleteFromCloudinary(c.url, { resourceType: c.type }).catch(() => {})));
         await Promise.all(localFiles.map(p => fs.promises.unlink(p).catch(() => {})));
