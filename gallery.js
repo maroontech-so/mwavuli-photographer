@@ -82,13 +82,16 @@ if (projectCollectionsEl || generalGallery) {
 
         photos.forEach((photo, i) => {
             const span = mosaic[i % mosaic.length];
+            const thumb = photo.thumbnail || photo.file;
             const media = photo.mediaType === "video"
-                ? `<video controls preload="metadata" draggable="false">
+                ? `<video controls preload="none" poster="${API}/uploads/${thumb}" draggable="false">
                         <source src="${API}/uploads/${photo.file}" type="video/mp4">
                    </video>`
-                : `<img src="${API}/uploads/${photo.file}" alt="${photo.title}" draggable="false">`;
+                : `<img src="${API}/uploads/${thumb}" alt="${photo.title}" data-full="${API}/uploads/${photo.file}" loading="lazy" decoding="async" draggable="false">`;
 
-            imageSources.push(`${API}/uploads/${photo.file}`);
+            if (photo.mediaType === "photo") {
+                imageSources.push(`${API}/uploads/${photo.file}`);
+            }
 
             generalGallery.innerHTML += `
             <div class="gallery-item ${span}">
@@ -98,10 +101,10 @@ if (projectCollectionsEl || generalGallery) {
 
         const images = generalGallery.querySelectorAll(".gallery-item img");
         images.forEach((img, idx) => {
-            img.addEventListener("click", () => {
-                const srcArray = Array.from(images).map(i => i.src);
-                window.openLightbox(srcArray, idx);
-            });
+                img.addEventListener("click", () => {
+                    const srcArray = Array.from(images).map(i => i.dataset.full || i.src);
+                    window.openLightbox(srcArray, idx);
+                });
         });
 
         protectImages();

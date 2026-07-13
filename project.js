@@ -46,9 +46,10 @@
             photos.forEach(photo => {
                 const div = document.createElement("div");
                 div.className = "gallery-item";
+                const thumb = photo.thumbnail || photo.file;
                 const media = photo.mediaType === "video"
-                    ? `<video controls preload="metadata" draggable="false"><source src="${API}/uploads/${photo.file}" type="video/mp4"></video>`
-                    : `<img src="${API}/uploads/${photo.file}" alt="${photo.title}" draggable="false">`;
+                    ? `<video controls preload="none" poster="${API}/uploads/${thumb}" draggable="false"><source src="${API}/uploads/${photo.file}" type="video/mp4"></video>`
+                    : `<img src="${API}/uploads/${thumb}" alt="${photo.title}" data-full="${API}/uploads/${photo.file}" loading="lazy" decoding="async" draggable="false">`;
                 div.innerHTML = media;
                 gallery.appendChild(div);
 
@@ -67,7 +68,7 @@
             const images = gallery.querySelectorAll(".gallery-item img");
             images.forEach((img, idx) => {
                 img.addEventListener("click", () => {
-                    const srcArray = Array.from(images).map(i => i.src);
+                    const srcArray = Array.from(images).map(i => i.dataset.full || i.src);
                     window.openLightbox(srcArray, idx);
                 });
             });

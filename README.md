@@ -230,9 +230,16 @@ The admin panel is located at `/admin/` and uses JWT-based authentication.
 ### Media Upload
 - General upload: upload photos/videos without project association
 - Project upload: upload media directly into a specific project
-- Supported formats: JPEG, PNG, JPG, MP4, QuickTime, AVI
+- Supported formats: JPEG, PNG, JPG, WebP, MP4, QuickTime, AVI, WebM
 - Maximum file size: 100MB per file
-- Files are stored in `/server/uploads/` and served via `/uploads/`
+- **Every upload is automatically sanitised** (see `server/utils/sanitize.js`):
+  - The real file type is validated by its bytes (not the client-supplied MIME type), so spoofed/unsafe files are rejected and discarded.
+  - Images are re-encoded to WebP, EXIF/GPS metadata is stripped, and they are right-sized to a 2000px display resolution with an 800px thumbnail.
+  - Videos are validated and normalised to H.264/AAC MP4 (with a poster thumbnail); falls back to validated passthrough when `ffmpeg` is unavailable.
+  - The original raw file is deleted and replaced by the sanitised output.
+- To sanitise media that was uploaded **before** this feature, run:
+  `node server/scripts/sanitize-existing.js` (requires `MONGO_URI` in `server/.env`).
+- Files are stored in `/server/uploads/` and served via `/uploads/`.
 
 ### Bulk Actions
 - Long-press or click a checkbox to enter selection mode
@@ -270,6 +277,14 @@ The admin panel is located at `/admin/` and uses JWT-based authentication.
 - Mobile (<=768px): hamburger menu opens a left sidebar
 - Reduced side padding and margins on small screens
 - Carousel shows fewer slides on smaller viewports
+
+### Performance & Caching
+- **Zero external requests.** Fonts (Cinzel + Poppins) and Font Awesome are self-hosted under `assets/fonts/` and `assets/vendor/fontawesome/` — no Google Fonts or cdnjs calls.
+- **Service worker (`sw.js`)** precaches the app shell and serves all same-origin static assets stale-while-revalidate, giving instant repeat visits and offline support. `GET /api/*` is never cached.
+- **Images** are served as right-sized WebP (see Media Upload); the hero is `<link rel="preload">`-ed for fast LCP.
+- Static assets get `Cache-Control: public, max-age=31536000, immutable` via `vercel.json`.
+- To refresh the self-hosted fonts after changing families/weights, run `node tools/fetch-fonts.js`.
+- If you change cached files, bump `CACHE_VERSION` in `sw.js` so clients pick up the new versions.
 
 ## Deployment
 

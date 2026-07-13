@@ -1,13 +1,34 @@
 (function () {
     const API = (function () {
         if (window.API_BASE) return window.API_BASE;
-        const hostname = window.location.hostname;
-        const port = window.location.port;
-        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') {
-            return port === '5000' || port === '' ? '' : 'http://localhost:5000';
+        const { protocol, hostname, port, origin } = window.location;
+        if (protocol === 'file:') return 'http://localhost:5000';
+        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0' || hostname === '[::1]') {
+            return (port === '5000' || port === '') ? '' : 'http://localhost:5000';
         }
-        return window.location.origin;
+        return origin; // deployed: same-origin serverless API
     })();
+    console.debug('[booking] API base =', JSON.stringify(API));
+
+    // Self-contained toast (public site has no admin bundle).
+    window.showToast = function (message, type = 'success') {
+        let container = document.getElementById('toastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ');
+        toast.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-body">${message}</div>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('hiding');
+            toast.addEventListener('animationend', () => toast.remove());
+        }, 3000);
+    };
 
     // Contact form -> creates a booking/message
     const contactForm = document.getElementById("contactForm");
@@ -39,8 +60,10 @@
                     bookingMessage.textContent = data.message || "Something went wrong.";
                 }
             } catch (err) {
+                console.error('Booking request failed:', err);
                 bookingMessage.style.color = "red";
-                bookingMessage.textContent = "Network error. Please try again.";
+                bookingMessage.textContent = "Network error. Please try again." +
+                    (err && err.message ? ` (${err.message})` : "");
             }
         });
     }

@@ -6,10 +6,21 @@
       "use": "@vercel/node"
     }
   ],
+  "headers": [
+    {
+      "source": "/(.*)\\.(css|js|webp|avif|jpg|jpeg|png|svg|woff2|woff|ttf|ico|json|webmanifest)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "server/server.js"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/admin/(.*)",

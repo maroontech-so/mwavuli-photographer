@@ -5,11 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MWAVULI Admin Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link rel="preload" as="style" href="../assets/fonts/fonts.css" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="../assets/fonts/fonts.css"></noscript>
     <link rel="stylesheet" href="dashboard.css">
 </head>
 
@@ -242,6 +239,12 @@
     <script src="admin-ui.js?v=3"></script>
     <script src="dashboard.js?v=3"></script>
 
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js").catch(() => { });
+        }
+    </script>
 </body>
 
 </html>

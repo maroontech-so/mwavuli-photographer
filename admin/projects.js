@@ -214,8 +214,8 @@ function renderProjectFiles(photos, project) {
         if (isCover) item.classList.add("is-cover");
 
         const media = photo.mediaType === "video"
-            ? `<video controls preload="metadata" src="${API}/uploads/${photo.file}" type="video/mp4"></video>`
-            : `<img src="${API}/uploads/${photo.file}" alt="${photo.title}">`;
+            ? `<video controls preload="none" poster="${API}/uploads/${photo.thumbnail || photo.file}" src="${API}/uploads/${photo.file}" type="video/mp4"></video>`
+            : `<img src="${API}/uploads/${photo.thumbnail || photo.file}" alt="${photo.title}" loading="lazy">`;
 
         item.innerHTML = `
             <div class="project-file-media">${media}</div>

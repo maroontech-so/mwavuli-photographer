@@ -6,11 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Testimonials</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link rel="preload" as="style" href="../assets/fonts/fonts.css" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="../assets/fonts/fonts.css"></noscript>
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="testimonials.css">
 </head>
@@ -133,6 +130,12 @@
     <script src="bulk-actions.js?v=4"></script>
     <script src="testimonials.js?v=4"></script>
 
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js").catch(() => { });
+        }
+    </script>
 </body>
 
 </html>
