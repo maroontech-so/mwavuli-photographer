@@ -8,14 +8,13 @@
     <link rel="icon" type="image/svg+xml" href="icon.svg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
-    <style>:root{--gold:#C89B3C;--gold-dark:#b4872d;--ink:#1f2937;--bg:#fafafa;--surface:#fff;--line:#e9e9ef;--radius:16px;--shadow:0 18px 45px rgba(31,41,55,.1);--section-pad:100px}*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--ink)}header{position:fixed;top:0;left:0;width:100%;background:#fff;backdrop-filter:blur(10px);box-shadow:0 15px 40px rgba(0,0,0,.08);z-index:1000}nav{width:90%;max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;padding:6px 0;max-height:50px}.logo{display:flex;align-items:center;gap:15px;font-size:24px;font-weight:bold;color:#222}.logo img{width:180px;height:auto;object-fit:contain}.nav-toggle{display:none;background:none;border:none;font-size:26px;color:#222;cursor:pointer}.mobile-sidebar{display:none}.mobile-cta{display:none}nav ul{display:flex;list-style:none;align-items:center;gap:28px}nav ul li a{text-decoration:none;color:#333;font-size:16px;font-weight:500}.nav-cta{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;padding:10px 22px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:600}</style>
-    <link rel="preload" as="style" href="style.css?v=5" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="style.css?v=5"></noscript>
-    <link rel="preload" as="image" href="assets/images/hero/hero.webp">
-    <link rel="preload" as="style" href="assets/fonts/fonts.css" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="assets/fonts/fonts.css"></noscript>
-    <link rel="preload" as="style" href="assets/vendor/fontawesome/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css"></noscript>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 </head>
 
@@ -23,7 +22,8 @@
     <header>
         <nav>
             <div class="logo">
-                <img src="assets/images/logo/logo.png" alt="Mwavuli Photography">
+                <a href="#home">
+                    <img href="#home" src="assets/images/logo/logo.png" alt="Mwavuli Photography">
             </div>
 
             <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
@@ -31,16 +31,16 @@
             </button>
 
             <ul id="navMenu">
-                <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="gallery.html">Portfolio</a></li>
+                <li><a href="#projects">Projects</a></li>
                 <li><a href="#services">Services</a></li>
                 <li><a href="#testimonials">Testimonials</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li class="mobile-cta"><a href="#contact" class="btn">Book Now</a></li>
             </ul>
 
-            <a href="#contact" class="btn nav-cta">Book Now</a>
+            <a href="#contact" class="btn nav-cta" style="font-size;">Book Now</a>
         </nav>
     </header>
 
@@ -69,7 +69,8 @@
             <div class="hero-content">
                 <h2>Transforming ordinary moments into extraordinary memories</h2>
                 <p>
-                    Passionate and visual storytelling dedicated to preserving life's most meaningful moments through timeless imagery.
+                    Passionate and visual storytelling dedicated to preserving life's most meaningful moments through
+                    timeless imagery.
                 </p>
                 <div class="buttons">
 
@@ -99,7 +100,7 @@
 
                 <picture>
                     <source srcset="assets/images/portraits/portrait1.webp" type="image/webp">
-                    <img src="assets/images/portraits/portrait1.jpg" alt="Photographer" loading="lazy" decoding="async">
+                    <img src="assets/images/portraits/portrait1.jpg" alt="Photographer" loading="lazy" decoding="async" width="450" height="506">
                 </picture>
 
             </div>
@@ -149,9 +150,11 @@
         <p>Browse our latest projects. Select any cover to view the full collection.</p>
 
         <div class="carousel-wrap">
-            <button class="carousel-btn prev" id="carouselPrev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="carousel-btn prev" id="carouselPrev" aria-label="Previous"><i
+                    class="fa-solid fa-chevron-left"></i></button>
             <div class="carousel-track" id="featuredCarousel"></div>
-            <button class="carousel-btn next" id="carouselNext" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="carousel-btn next" id="carouselNext" aria-label="Next"><i
+                    class="fa-solid fa-chevron-right"></i></button>
         </div>
 
         <div class="teaser-cta">
@@ -204,6 +207,24 @@
                 <p>Tell your love story with creative engagement photography.</p>
             </div>
 
+        </div>
+
+    </section>
+
+    <section id="projects" class="projects">
+
+        <h2>All Projects</h2>
+        <p>Every project tells a unique story.</p>
+
+        <div id="projectsContainer" class="home-projects-grid"></div>
+
+        <div class="home-gallery-section">
+            <h3>GALLERY</h3>
+            <p class="home-gallery-subtitle">A curated mosaic of moments we've captured.</p>
+            <div class="gallery" id="homeGallery" data-limit="12"></div>
+            <div class="teaser-cta">
+                <a href="gallery.html" class="btn">View Full Gallery</a>
+            </div>
         </div>
 
     </section>
@@ -321,24 +342,29 @@
                     <input type="tel" id="phone" placeholder="Phone Number" required>
 
                     <div class="service-picker" id="servicePicker">
-                        <div class="service-picker-trigger" id="servicePickerTrigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="serviceLabel">
+                        <div class="service-picker-trigger" id="servicePickerTrigger" tabindex="0" role="combobox"
+                            aria-expanded="false" aria-haspopup="listbox" aria-labelledby="serviceLabel">
                             <span class="service-picker-value" id="servicePickerValue">Select Photography Service</span>
                             <span class="service-picker-caret"><i class="fa-solid fa-chevron-down"></i></span>
                         </div>
                         <div class="service-picker-dropdown" id="servicePickerDropdown" role="listbox">
-                            <div class="service-picker-option" data-value="Wedding" role="option" aria-selected="false" tabindex="-1">
+                            <div class="service-picker-option" data-value="Wedding" role="option" aria-selected="false"
+                                tabindex="-1">
                                 <span class="service-icon"><i class="fa-solid fa-ring"></i></span>
                                 <span class="service-text">Wedding</span>
                             </div>
-                            <div class="service-picker-option" data-value="Portrait" role="option" aria-selected="false" tabindex="-1">
+                            <div class="service-picker-option" data-value="Portrait" role="option" aria-selected="false"
+                                tabindex="-1">
                                 <span class="service-icon"><i class="fa-solid fa-camera"></i></span>
                                 <span class="service-text">Portrait</span>
                             </div>
-                            <div class="service-picker-option" data-value="Graduation" role="option" aria-selected="false" tabindex="-1">
+                            <div class="service-picker-option" data-value="Graduation" role="option"
+                                aria-selected="false" tabindex="-1">
                                 <span class="service-icon"><i class="fa-solid fa-graduation-cap"></i></span>
                                 <span class="service-text">Graduation</span>
                             </div>
-                            <div class="service-picker-option" data-value="Event" role="option" aria-selected="false" tabindex="-1">
+                            <div class="service-picker-option" data-value="Event" role="option" aria-selected="false"
+                                tabindex="-1">
                                 <span class="service-icon"><i class="fa-solid fa-calendar-days"></i></span>
                                 <span class="service-text">Event</span>
                             </div>
@@ -353,14 +379,8 @@
                     </div>
 
                     <div class="datepicker-container">
-                        <input 
-                            type="text" 
-                            id="date" 
-                            class="custom-date-input" 
-                            placeholder="Select date" 
-                            required 
-                            readonly
-                        >
+                        <input type="text" id="date" class="custom-date-input" placeholder="Select date" required
+                            readonly>
                         <div class="mini-calendar" id="miniCalendar">
                             <div class="calendar-header">
                                 <button class="nav-btn" id="prevMonthBtn" aria-label="Previous Month">&larr;</button>
@@ -396,13 +416,12 @@
 
     <!-- Image Lightbox -->
     <div class="lightbox" id="lightbox">
-        <span class="close">&times;</span>
-        <button class="lightbox-nav lightbox-prev" aria-label="Previous">&lt;</button>
-        <button class="lightbox-nav lightbox-next" aria-label="Next">&gt;</button>
-        <img id="lightbox-img" src="" alt="Preview">
-    </div>
 
-    <div id="toastContainer" class="toast-container"></div>
+        <span class="close">&times;</span>
+
+        <img id="lightbox-img" src="" alt="Preview">
+
+    </div>
 
     <footer class="footer">
 
@@ -423,7 +442,7 @@
 
             <a href="#"><i class="fa-brands fa-instagram"></i></a>
 
-            
+
             <a href="#"><i class="fa-brands fa-tiktok"></i></a>
 
             <a href="https://wa.me/254769578232" target="_blank">
@@ -435,7 +454,8 @@
         <p>&copy; 2026 MWAVULI PHOTOGRAPHY. All Rights Reserved.</p>
 
     </footer>
-    <script src="script.js?v=5" defer></script>
+    <script src="script.js"></script>
+    <script src="gallery.js"></script>
     <script>
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("sw.js").catch(() => { });
