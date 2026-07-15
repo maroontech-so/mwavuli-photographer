@@ -24,7 +24,7 @@ async function loadGallery() {
                 <input type="checkbox" class="card-checkbox" aria-label="Select">
                 ${
                     photo.mediaType === "video"
-                        ? `<video controls preload="none" poster="${mediaUrl(photo.thumbnail || photo.file)}">
+                        ? `<video controls preload="metadata"${photo.thumbnail ? ` poster="${mediaUrl(photo.thumbnail)}"` : ""}>
                                 <source src="${mediaUrl(photo.file)}" type="video/mp4">
                             </video>`
                         : `<img src="${mediaUrl(photo.thumbnail || photo.file)}" alt="${photo.title}" loading="lazy">`

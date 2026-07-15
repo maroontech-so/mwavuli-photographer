@@ -220,7 +220,7 @@ function renderProjectFiles(photos, project) {
         if (isCover) item.classList.add("is-cover");
 
         const media = photo.mediaType === "video"
-            ? `<video controls preload="none" poster="${mediaUrl(photo.thumbnail || photo.file)}" src="${mediaUrl(photo.file)}" type="video/mp4"></video>`
+            ? `<video controls preload="metadata"${photo.thumbnail ? ` poster="${mediaUrl(photo.thumbnail)}"` : ""} src="${mediaUrl(photo.file)}" type="video/mp4"></video>`
             : `<img src="${mediaUrl(photo.thumbnail || photo.file)}" alt="${photo.title}" loading="lazy">`;
 
         item.innerHTML = `

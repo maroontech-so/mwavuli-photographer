@@ -435,6 +435,24 @@
         });
     }
 
+    // ---- About image (dynamic) ----
+    async function loadAboutImage() {
+        const container = document.getElementById("aboutImageContainer");
+        if (!container) return;
+        try {
+            const res = await fetch(`${API}/api/about`);
+            const data = await res.json();
+            if (data && data.success && data.image) {
+                const picture = container.querySelector("picture");
+                if (picture) {
+                    picture.outerHTML = `<picture><source srcset="${cldUrl(mediaUrl(data.image), 'w_800,c_limit,q_auto,f_auto')}" type="image/webp"><img src="${cldUrl(mediaUrl(data.image), 'w_800,c_limit,q_auto,f_auto')}" alt="${data.alt || 'Photographer'}" loading="lazy" decoding="async" width="450" height="506"></picture>`;
+                }
+            }
+        } catch (err) {
+            console.error("Failed to load about image", err);
+        }
+    }
+
     // ---- Hero slideshow (dynamic, swipe-able) ----
     function initHeroSlideshow() {
         const container = document.getElementById("heroSlides");
@@ -587,4 +605,5 @@
     }
 
     initHeroSlideshow();
+    loadAboutImage();
 })();

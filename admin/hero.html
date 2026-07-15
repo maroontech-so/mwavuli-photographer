@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hero Management</title>
+    <title>Homepage</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +37,7 @@
                         <rect x="3" y="3" width="18" height="18" rx="2" />
                         <path d="M3 9h18M9 21V9" />
                     </svg>
-                    Hero</a></li>
+                    Homepage</a></li>
             <li><a href="gallery.html">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -95,9 +95,23 @@
 
         <div class="page-header">
             <div>
-                <h1>Hero Management</h1>
-                <p>Upload and arrange the images shown in the homepage hero slideshow.</p>
+                <h1>Homepage</h1>
+                <p>Manage the homepage hero slideshow and about section image.</p>
             </div>
+        </div>
+
+        <div class="card about-card">
+            <h2>About Section Image</h2>
+            <p class="card-hint">Update the image shown in the homepage About section.</p>
+            <form id="aboutUploadForm" class="panel-form" enctype="multipart/form-data">
+                <div id="aboutCurrentPreview" class="about-preview"></div>
+                <label for="aboutImage">About image</label>
+                <input type="file" id="aboutImage" accept="image/*">
+                <label for="aboutAlt">Image alt text</label>
+                <input type="text" id="aboutAlt" placeholder="Photographer">
+                <button type="submit" id="aboutSubmitBtn">Update About Image</button>
+                <p id="aboutMsg" class="form-msg"></p>
+            </form>
         </div>
 
         <div class="hero-settings card">
@@ -154,6 +168,7 @@
     <script src="auth.js?v=4"></script>
     <script src="admin-ui.js?v=4"></script>
     <script src="bulk-actions.js?v=4"></script>
+    <script src="about.js?v=1"></script>
     <script src="hero.js?v=1"></script>
     <script>
         if ("serviceWorker" in navigator) {

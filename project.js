@@ -59,9 +59,17 @@
                 const thumbBase = mediaUrl(photo.thumbnail || photo.file);
                 const thumbUrl = cldUrl(thumbBase, "w_640,c_limit,q_auto,f_auto");
                 const fullUrl = cldUrl(mediaUrl(photo.file), "w_1600,c_limit,q_auto,f_auto");
-                const media = photo.mediaType === "video"
-                    ? `<video controls preload="none" poster="${thumbUrl}" draggable="false"><source src="${fullUrl}" type="video/mp4"></video>`
-                    : `<img src="${thumbUrl}" alt="${photo.title}" data-full="${fullUrl}" loading="lazy" decoding="async" draggable="false">`;
+
+                let media;
+                if (photo.mediaType === "video") {
+                    const poster = photo.thumbnail
+                        ? cldUrl(mediaUrl(photo.thumbnail), "w_640,c_limit,q_auto,f_auto")
+                        : "";
+                    media = `<video autoplay muted loop playsinline preload="metadata"${poster ? ` poster="${poster}"` : ""} draggable="false" src="${fullUrl}"></video>`;
+                } else {
+                    media = `<img src="${thumbUrl}" alt="${photo.title}" data-full="${fullUrl}" loading="lazy" decoding="async" draggable="false">`;
+                }
+
                 div.innerHTML = media;
                 gallery.appendChild(div);
 
@@ -76,6 +84,22 @@
                 const span = mosaic[i % mosaic.length];
                 if (span) item.classList.add(span);
             });
+
+            // Graceful muted autoplay: only play videos while on screen.
+            const videos = gallery.querySelectorAll(".gallery-item video");
+            const playVideo = (v) => { v.muted = true; v.play().catch(() => {}); };
+            if ("IntersectionObserver" in window) {
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach(e => {
+                        const v = e.target;
+                        if (e.isIntersecting) playVideo(v);
+                        else v.pause();
+                    });
+                }, { threshold: 0.25 });
+                videos.forEach(v => io.observe(v));
+            } else {
+                videos.forEach(playVideo);
+            }
 
             const images = gallery.querySelectorAll(".gallery-item img");
             images.forEach((img, idx) => {

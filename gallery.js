@@ -125,11 +125,18 @@ if (projectCollectionsEl || generalGallery) {
                 `${thumbUrl} 640w, ` +
                 `${cldUrl(thumbBase, "w_800,c_limit,q_auto,f_auto")} 800w`;
 
-            const media = photo.mediaType === "video"
-                ? `<video controls preload="none" poster="${thumbUrl}" draggable="false">
-                        <source src="${fullUrl}" type="video/mp4">
-                   </video>`
-                : `<img src="${thumbUrl}" srcset="${srcset}" sizes="(max-width:600px) 100vw, (max-width:1024px) 50vw, 33vw" alt="${escapeHtml(photo.title)}" data-full="${fullUrl}" loading="lazy" decoding="async" draggable="false">`;
+            let media;
+            if (photo.mediaType === "video") {
+                // Only use a real image as the poster. Without a thumbnail
+                // (e.g. on hosts without ffmpeg) the fallback would be the video
+                // URL itself, which renders as a broken image.
+                const poster = photo.thumbnail
+                    ? cldUrl(mediaUrl(photo.thumbnail), "w_640,c_limit,q_auto,f_auto")
+                    : "";
+                media = `<video autoplay muted loop playsinline preload="metadata"${poster ? ` poster="${poster}"` : ""} draggable="false" src="${fullUrl}"></video>`;
+            } else {
+                media = `<img src="${thumbUrl}" srcset="${srcset}" sizes="(max-width:600px) 100vw, (max-width:1024px) 50vw, 33vw" alt="${escapeHtml(photo.title)}" data-full="${fullUrl}" loading="lazy" decoding="async" draggable="false">`;
+            }
 
             return `
                 <div class="gallery-item ${span}">
@@ -138,6 +145,23 @@ if (projectCollectionsEl || generalGallery) {
         });
 
         generalGallery.innerHTML = parts.join("");
+
+        // Graceful muted autoplay: play videos only while they're on screen so
+        // the page never chokes on many simultaneous streams.
+        const videos = generalGallery.querySelectorAll(".gallery-item video");
+        const playVideo = (v) => { v.muted = true; v.play().catch(() => {}); };
+        if ("IntersectionObserver" in window) {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    const v = e.target;
+                    if (e.isIntersecting) playVideo(v);
+                    else v.pause();
+                });
+            }, { threshold: 0.25 });
+            videos.forEach(v => io.observe(v));
+        } else {
+            videos.forEach(playVideo);
+        }
 
         const images = generalGallery.querySelectorAll(".gallery-item img");
         images.forEach((img, idx) => {

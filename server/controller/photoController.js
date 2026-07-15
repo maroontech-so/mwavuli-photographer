@@ -93,6 +93,7 @@ exports.uploadPhoto = async (req, res) => {
         });
 
     } catch (error) {
+        console.error("Upload failed:", error && error.stack ? error.stack : error);
         // Roll back: remove anything already pushed to Cloudinary and any
         // local temp files left behind for this request.
         await Promise.all(

@@ -5,10 +5,24 @@ const upload = require("../middleware/upload");
 const photoController = require("../controller/photoController");
 const auth = require("../middleware/auth");
 
+// Wrap multer so size/type rejections return a clean 400 instead of a 500.
+function handleUpload(req, res, next) {
+    upload.array("images", 20)(req, res, (err) => {
+        if (err) {
+            const status = err.code === "LIMIT_FILE_SIZE" ? 413 : 400;
+            return res.status(status).json({
+                success: false,
+                message: err.message || "Upload rejected"
+            });
+        }
+        next();
+    });
+}
+
 router.post(
     "/upload",
     auth,
-    upload.array("images", 20),
+    handleUpload,
     photoController.uploadPhoto
 );
 
